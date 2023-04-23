@@ -18,7 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.csd2522.ValidationFormat.Console;
+
 import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
 
