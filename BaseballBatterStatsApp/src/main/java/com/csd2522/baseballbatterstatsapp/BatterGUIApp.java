@@ -1,5 +1,5 @@
 /*
-Author: Batter Team Daniel Cronauer
+Author: Batter Team Daniel Cronauer, Next person
 Date: 4/21/2023 added to project
 File: Console.java
 Purpose: Driver App, starts main window for App
