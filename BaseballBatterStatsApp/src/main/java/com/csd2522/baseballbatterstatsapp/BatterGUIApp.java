@@ -1,5 +1,5 @@
 /*
-Author: Batter Team Daniel Cronauer, Michael Mowad, Andrew McKee
+Author: Batter Team Daniel Cronauer, Michael Mowad, Andrew McKee, Gage Ruf
 Date: 4/21/2023 added to project
 File: Console.java
 Purpose: Driver App, starts main window for App
