@@ -8,6 +8,7 @@ package com.csd2522.DB;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.lang.StringBuilder;
 /**
  *
  * @author Daniel Cronauer 4/22/2023 Carried over DB from chapter 19 and used for this project
@@ -137,8 +138,48 @@ public class BatterDB {
         }    
         
         return teamIDList;
+    }    
+    // this method will start as test, print game information to console, then when complete, I will 
+    // have it print to a file, just like the project requires DC 4/25/2023
+    public void printGameToFile(int gameId) {
+         try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_one_id, Game_team_two_id, Game_win_id, Game_team_one_score, Game_team_two_score, Game_date "
+                 + "FROM Games WHERE Game_id =?"))            
+        {
+            //tell us what the ? paramter will take value of gameId passed to this method DC 4/25/2023
+            ps.setInt(1,gameId);
+            // create ResultSet object DC 4/25/2023
+            ResultSet rs = ps.executeQuery();
+            
+            //define stringbuilder object here so we can effiecinetly build string to print to console and later print to file
+            StringBuilder fileSB = new StringBuilder(500);
+            
+            //as long as there is a result in result set we will continue going DC 4/25/2023
+            while (rs.next())
+            {
+                //use define variables for all the columns from select statement above DC 4/25/2023
+                String awayTeam = rs.getString(1);
+                String homeTeam = rs.getString(2);
+                String winTeam = rs.getString(3);
+                int awayScore = rs.getInt(4);
+                int homeScore = rs.getInt(5);
+                String gameDate = rs.getString(6);
+                
+                fileSB.append("The away team is:" + awayTeam + "\nThe home team is: " +homeTeam + "\nThe winning team is: " +winTeam + "\nThe away team scored: " + awayScore
+                + "\nThe home team scored: " +homeScore + "\nThe game was on: " + gameDate);
+            }
+            
+            rs.close();
+            
+            //print string build object to console as test, in future we will just print this whole string to the file
+            System.out.println(fileSB.toString());
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query");
+            System.out.println(e);
+        }    
     }
-//    
+    
 //    // this method should print all completed tasks
 //    public void printCompletedTasks() {
 //         try(PreparedStatement ps = connection.prepareStatement("SELECT *FROM Task WHERE completed = ?"))            

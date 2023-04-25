@@ -15,13 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.HashMap;
 
-import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
 import com.csd2522.UI.GameReportGui;
 import com.csd2522.UI.AggregateStatGui;
@@ -102,5 +98,5 @@ public class BatterGUIApp extends Application {
         
         return iterateBox;
     }
-    
+        
 }
