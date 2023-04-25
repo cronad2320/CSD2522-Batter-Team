@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="E:/Classes (copy)/Classes/Spring2023/Java II/FinalProject/CSD2522-Batter-Team/BaseballBatterStatsApp/Batter.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="150"/><column_width id="3" width="9227"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,5:mainGames"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1">
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="E:/Classes (copy)/Classes/Spring2023/Java II/FinalProject/CSD2522-Batter-Team/BaseballBatterStatsApp/Batter.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="150"/><column_width id="3" width="9227"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,12:mainBatter_Stats"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1">
 DROP TABLE IF EXISTS Batter_Stats;
 DROP TABLE IF EXISTS Players;
 DROP TABLE IF EXISTS Games;
@@ -23,7 +23,9 @@ CREATE TABLE &quot;Players&quot; (
 	&quot;Player_primary_pos_id&quot;	TEXT NOT NULL,
 	&quot;Player_last_name&quot;	TEXT NOT NULL,
 	&quot;Player_first_name&quot;	INTEGER NOT NULL,
+	&quot;Player_team_id&quot; TEXT NOT NULL,
     FOREIGN KEY(&quot;Player_primary_pos_id&quot;) REFERENCES Positions(Position_id) ,
+	FOREIGN KEY(&quot;Player_team_id&quot;) REFERENCES Teams(Team_id) ,
 	PRIMARY KEY(&quot;Player_id&quot; AUTOINCREMENT)
 );
 
