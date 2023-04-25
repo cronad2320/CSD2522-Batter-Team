@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 
 import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
+import com.csd2522.UI.GameReportGui;
+
 
 
 /**
@@ -50,7 +52,7 @@ public class BatterGUIApp extends Application {
         buttonNewWindow.setText("New window");
         testBox.getChildren().add(buttonNewWindow);
         // new handler event call newWindow when button clicked
-        buttonNewWindow.setOnAction(event -> newWindow());//new EventHandler<ActionEvent>()
+        buttonNewWindow.setOnAction(event -> new GameReportGui().start(stage));//new EventHandler<ActionEvent>()
       
        
         
