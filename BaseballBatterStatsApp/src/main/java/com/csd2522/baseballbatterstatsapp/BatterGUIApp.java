@@ -3,7 +3,7 @@ Author: Batter Team Daniel Cronauer, Michael Mowad, Andrew McKee, Gage Ruf
 Date: 4/21/2023 added to project
 File: Console.java
 Purpose: Driver App, starts main window for App
-
+Update: Micael Mowad 4/25/2023 new GUI format for whole driver app
  */
 
 package com.csd2522.baseballbatterstatsapp;
@@ -19,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.util.HashMap;
 
 import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
@@ -31,7 +32,11 @@ import javafx.geometry.Insets;
  * JavaFX BatterGUIApp
  */
 public class BatterGUIApp extends Application {
+    //define instance of BatterDB DC 4/25/2023
+    BatterDB db = new BatterDB();
 
+    // define games hashmap to populate list DC 4/25/2023
+    private HashMap<String, Integer> games = db.getTeams();
     @Override
     public void start(Stage stage) {
         //GridPane to attach items to
@@ -43,8 +48,10 @@ public class BatterGUIApp extends Application {
         
         // ComboBox Set Up
         ComboBox<String> gameSelect = new ComboBox<>();
-        gameSelect.getItems().add("Test 1");
-        gameSelect.getItems().add("Test 2");
+        
+        //fill gameSelect combo box DC 4/25/2023
+        fillGameCombo(gameSelect,games);
+        
         gameSelect.setPromptText("Select Game");
         
         // Buttons Set up
@@ -79,9 +86,20 @@ public class BatterGUIApp extends Application {
         stage.setTitle("Batter Stats Application");
         stage.show();
     }
-
+    
     public static void main(String[] args) {
     
         launch();
     }
+    
+     // this method will take in a comboBox and fill it with the player positions in array playerPositions DC 4/25/2023
+    public static ComboBox<String> fillGameCombo(ComboBox<String> iterateBox, HashMap<String, Integer> game) {
+        // loop through each element in game hashmap to fill the comboBox we pass to this function DC 4/25/2023
+        for ( HashMap.Entry<String,Integer> element : game.entrySet()) {
+            iterateBox.getItems().add(element.getKey());
+        }
+        
+        return iterateBox;
+    }
+    
 }
