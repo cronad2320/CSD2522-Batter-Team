@@ -62,7 +62,7 @@ public class BatterGUIApp extends Application {
         // batterStatsButton.setOnAction(event -> );
         
         Button gameReportButton = new Button("Generate Game Report");
-        gameReportButton.setOnAction(event -> new GameReportGui().start(stage));
+        gameReportButton.setOnAction(event -> printGameReport(gameSelect,games));
         
         Button aggregateButton = new Button("Generate Aggregate Player Data");
         // aggregateButton.setOnAction(event -> ); 
@@ -101,5 +101,21 @@ public class BatterGUIApp extends Application {
         
         return iterateBox;
     }
+    
+    //this method takes in value from combobox and then calls printGameToFile with id came from hashmap as match for value in combobox 4/25/2023
+    public static void printGameReport(ComboBox<String> gameBox, HashMap<String, Integer> game)
+    {
+        // create instance for DB connection DC 4/25/2023
+        BatterDB db = new BatterDB();
+
+        //get selected value string and save to key, then use key to get the game id DC 4/25/2023
+        String key = gameBox.getSelectionModel().getSelectedItem();
+        // get gameID 4/25/2023
+        int gameID = game.get(key);
+        
+        //pass gameID to printToFile DC 4/25/2023
+        db.printGameToFile(gameID);   
+    }
+    
     
 }
