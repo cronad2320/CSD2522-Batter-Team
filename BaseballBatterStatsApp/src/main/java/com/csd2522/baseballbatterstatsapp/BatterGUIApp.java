@@ -13,6 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -22,6 +23,7 @@ import javafx.stage.Stage;
 import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
 import com.csd2522.UI.GameReportGui;
+import javafx.geometry.Insets;
 
 
 
@@ -34,68 +36,52 @@ public class BatterGUIApp extends Application {
     public void start(Stage stage) {
         //GridPane to attach items to
         GridPane mainPane = new GridPane();
-        
         mainPane.setAlignment(Pos.TOP_LEFT);
+        mainPane.setPadding(new Insets(10, 25, 25, 25));
+        mainPane.setHgap(10);
+        mainPane.setVgap(10);
         
+        // ComboBox Set Up
+        ComboBox<String> gameSelect = new ComboBox<>();
+        gameSelect.getItems().add("Test 1");
+        gameSelect.getItems().add("Test 2");
+        gameSelect.setPromptText("Select Game");
+        
+        // Buttons Set up
+        Button newGameButton = new Button("Create New Game");
+        // newGameButton.setOnAction(event -> );
+        
+        Button batterStatsButton = new Button("Enter Batter Game Stats");
+        // batterStatsButton.setOnAction(event -> );
+        
+        Button gameReportButton = new Button("Generate Game Report");
+        gameReportButton.setOnAction(event -> new GameReportGui().start(stage));
+        
+        Button aggregateButton = new Button("Generate Aggregate Player Data");
+        // aggregateButton.setOnAction(event -> ); 
+        
+        Button addPlayersButton = new Button("Add New Players");
+        // addPlayersButton.setOnAction(event -> );
       
+        // Add to grid
+        mainPane.add(new Label("Game:"), 0, 0);
+        mainPane.add(gameSelect, 0, 1);
+        mainPane.add(newGameButton, 1, 1);
+        mainPane.add(new Label("Enter Stats and Players:"), 0, 2);
+        mainPane.add(batterStatsButton, 0, 3);
+        mainPane.add(addPlayersButton, 1, 3);
+        mainPane.add(new Label("Generate Reports:"), 0, 4);
+        mainPane.add(gameReportButton, 0, 5);
+        mainPane.add(aggregateButton, 1, 5);
         
-        //hbox for items
-        HBox testBox = new HBox(10);
-        
-        //create button for new window
-        Label label1 = new Label("First page!");
-        Label label2 = new Label("Test two!");
-        testBox.getChildren().add(label1);
-        testBox.getChildren().add(label2);
-        
-        Button buttonNewWindow = new Button();
-        buttonNewWindow.setText("New window");
-        testBox.getChildren().add(buttonNewWindow);
-        // new handler event call newWindow when button clicked
-        buttonNewWindow.setOnAction(event -> new GameReportGui().start(stage));//new EventHandler<ActionEvent>()
-      
-       
-        
-        // add Hbox to grid
-        mainPane.add(testBox, 0, 0);
-        
-        Scene scene = new Scene(mainPane, 640, 480);
+        Scene scene = new Scene(mainPane);
         stage.setScene(scene);
-        stage.setTitle("Landing Page");
+        stage.setTitle("Batter Stats Application");
         stage.show();
     }
 
     public static void main(String[] args) {
-        
-        launch();
-    }
-    /**
-    *Simple test to see if we can run a new window
-    */
-    public static void newWindow()
-    {
-        Label newPageLabel = new Label("New label new window!");
-        Button button2 = new Button();
-        button2.setText("test");
-        GridPane newLayout = new GridPane();
-
-        newLayout.add(newPageLabel,0,0);
-        newLayout.add(button2,0,1);
-        
-        button2.setOnAction(event -> printPlayers()); // test db connection
-        
-        Scene newScene = new Scene(newLayout,200,200);
-        //set new stage
-        Stage newWindow = new Stage();
-        newWindow.setTitle("New page!");
-        newWindow.setScene(newScene);
-
-        newWindow.show();
-    }
     
-    public static void printPlayers()
-    {
-        BatterDB db = new BatterDB();
-        db.printPlayers();
+        launch();
     }
 }
