@@ -6,6 +6,7 @@ package com.csd2522.DB;
 
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 /**
  *
@@ -114,6 +115,28 @@ public class BatterDB {
          
         //return filled HashMap DC 4/25/2023
         return games;
+    }
+    
+    public static ArrayList<String> getTeamIDs(){
+        ArrayList<String> teamIDList = new ArrayList<>();
+        
+        try(Statement statement = connection.createStatement())            
+        {
+            ResultSet rs = statement.executeQuery("SELECT Team_id FROM Teams");
+            
+            while(rs.next()){
+                teamIDList.add(rs.getString(1));
+            }
+            
+            rs.close();
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling teams");
+            System.out.println(e);
+        }    
+        
+        return teamIDList;
     }
 //    
 //    // this method should print all completed tasks

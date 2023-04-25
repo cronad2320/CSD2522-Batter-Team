@@ -24,6 +24,7 @@ import java.util.HashMap;
 import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.DB.BatterDB;
 import com.csd2522.UI.GameReportGui;
+import com.csd2522.UI.AggregateStatGui;
 import javafx.geometry.Insets;
 
 
@@ -65,7 +66,7 @@ public class BatterGUIApp extends Application {
         gameReportButton.setOnAction(event -> new GameReportGui().start(stage));
         
         Button aggregateButton = new Button("Generate Aggregate Player Data");
-        // aggregateButton.setOnAction(event -> ); 
+        aggregateButton.setOnAction(event -> new AggregateStatGui().start(stage));
         
         Button addPlayersButton = new Button("Add New Players");
         // addPlayersButton.setOnAction(event -> );
