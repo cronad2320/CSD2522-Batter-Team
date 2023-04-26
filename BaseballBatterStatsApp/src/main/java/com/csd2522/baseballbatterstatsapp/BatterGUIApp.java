@@ -36,6 +36,10 @@ public class BatterGUIApp extends Application {
     private HashMap<String, Integer> games = db.getTeams();
     @Override
     public void start(Stage stage) {
+        //add new stage to call other ui pages DC 4/26/2023
+        Stage playerStage = new Stage();
+        Stage aggregateStage = new Stage();
+
         //GridPane to attach items to
         GridPane mainPane = new GridPane();
         mainPane.setAlignment(Pos.TOP_LEFT);
@@ -62,10 +66,10 @@ public class BatterGUIApp extends Application {
         gameReportButton.setOnAction(event -> printGameReport(gameSelect,games));
         
         Button aggregateButton = new Button("Generate Aggregate Player Data");
-        aggregateButton.setOnAction(event -> new AggregateStatGui().start(stage));
+        aggregateButton.setOnAction(event -> new AggregateStatGui().start(aggregateStage));
         
         Button addPlayersButton = new Button("Add New Players");
-        addPlayersButton.setOnAction(event -> new PlayerAddGUI().start(stage) );
+        addPlayersButton.setOnAction(event -> new PlayerAddGUI().start(playerStage) );
       
         // Add to grid
         mainPane.add(new Label("Game:"), 0, 0);
@@ -104,14 +108,20 @@ public class BatterGUIApp extends Application {
     {
         // create instance for DB connection DC 4/25/2023
         BatterDB db = new BatterDB();
-
+        // check if there is value for HashMap if not do not do anything for now later dialog box DC 4/25/2023
+        
+         
         //get selected value string and save to key, then use key to get the game id DC 4/25/2023
         String key = gameBox.getSelectionModel().getSelectedItem();
-        // get gameID 4/25/2023
-        int gameID = game.get(key);
-        
-        //pass gameID to printToFile DC 4/25/2023
-        db.printGameToFile(gameID);   
+        // first check if contains key to avoid errors
+        if(game.containsKey(key))
+        {
+            // get gameID 4/25/2023
+            int gameID = game.get(key);
+
+            //pass gameID to printToFile DC 4/25/2023
+            db.printGameToFile(gameID);   
+        }
     }
         
 }
