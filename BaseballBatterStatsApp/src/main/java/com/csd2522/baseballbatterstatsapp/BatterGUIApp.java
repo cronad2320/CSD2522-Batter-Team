@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 
 import com.csd2522.DB.BatterDB;
-import com.csd2522.UI.GameReportGui;
+import com.csd2522.UI.PlayerAddGUI;
 import com.csd2522.UI.AggregateStatGui;
 import javafx.geometry.Insets;
 
@@ -65,7 +65,7 @@ public class BatterGUIApp extends Application {
         aggregateButton.setOnAction(event -> new AggregateStatGui().start(stage));
         
         Button addPlayersButton = new Button("Add New Players");
-        // addPlayersButton.setOnAction(event -> );
+        addPlayersButton.setOnAction(event -> new PlayerAddGUI().start(stage) );
       
         // Add to grid
         mainPane.add(new Label("Game:"), 0, 0);
