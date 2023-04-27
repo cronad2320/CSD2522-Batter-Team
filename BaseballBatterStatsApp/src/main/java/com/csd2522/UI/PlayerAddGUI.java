@@ -8,6 +8,7 @@ package com.csd2522.UI;
 
 
 
+import com.csd2522.Batter.Batter;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,180 +24,293 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import com.csd2522.ValidationFormat.Validation;
 import com.csd2522.baseballbatterstatsapp.*;
+import java.util.HashMap;
+import javafx.scene.control.ComboBox;
+import com.csd2522.DB.BatterDB;
+import java.util.ArrayList;
+import com.csd2522.ValidationFormat.*;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 /**
  *
  * @author team
  * Starting Daniel Cronauer 4/25/2023
+ * Updates : 4/26/2023 DC added elements to fill GUI and built some fill methods to fill combo boxes
  */
 public class PlayerAddGUI extends Application {
-    private Label teamPromptLabel = new Label("Select Team to Generate Stats: ");
-    private TextField itemField = new TextField();
-    private Label listViewLabel = new Label("List: ");
-    private ListView<String> groceryListView = new ListView<>();
+    //set String for Select Team string
+    String selectTeamLabelString = StringUtil.padWithSpacesReverse("Select Team and click button to fill box of players:",60);
+    String selectPlayerLabelString = StringUtil.padWithSpacesReverse("SELECT PLAYER and hit button to update:", selectTeamLabelString.length());
+    String teamSelectButtonString = "Pull Players By Team";
+    String playerSelectButtonString = StringUtil.padWithSpaces("SELECT Player",teamSelectButtonString.length()+4);
+    String playerFirstLabelString = StringUtil.padWithSpacesReverse("First Name", 25);
+    String playerLastLabelString = StringUtil.padWithSpacesReverse("Last Name", 25);
+    
+    // get DB instance
+    private BatterDB db = new BatterDB();
+    
+    // create different gui controls
+    private Label teamPromptLabel = new Label(selectTeamLabelString);
+    private Label playerLabel = new Label(selectPlayerLabelString);
+    private ComboBox<String> playerCB = new ComboBox<>();
+    private ComboBox<String> teamCB = new ComboBox<>();
+    private TextField playerFirst = new TextField();
+    private TextField playerLast = new TextField();
+    
+    private Button processButton = new Button(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5));
+    // data structures to hold players and teams (will use these for getting values for SQL later)
+    private TreeMap<String,Integer> players = new TreeMap<>();
+    private ArrayList<String> teams = db.getTeamIDs();
     
     // This is the start method for JavaFX it handles creation of scene, stage
-    // and controls
+    // and controls DC 4//26/2023
     @Override
     public void start(Stage primaryStage) {
-        // title set
-        primaryStage.setTitle("Generate Game Report");
         
-        // we are using the grid object as root for scene. All other layout
-        // controls will go into grid
+        
+        // title set
+        primaryStage.setTitle("Insert or Update Player by Team");
+        
+        // we are using the grid object as root for scene. All other layout 
+        // controls will go into grid DC 4//26/2023
         GridPane grid = new GridPane();
         // set alignment
         grid.setAlignment(Pos.TOP_LEFT);
         // set padding
         grid.setPadding(new Insets(25, 25, 25, 25));
-        // set horizontal and vertical gaps between compoents in grid
+        // set horizontal and vertical gaps between compoents in grid DC 4//26/2023
         grid.setHgap(10);
         grid.setVgap(10);
         
-        // create scene object and add grid layout to it added size of window
-        Scene scene = new Scene(grid);
+        // create scene object and add grid layout to it added size of window DC 4//26/2023
+        Scene scene = new Scene(grid, 1000,300);
         
-        // create vbox 10 px padding between controls
+        // create vbox 10 px padding between controls DC 4//26/2023
         VBox appContainer = new VBox(10);
         
-        // create Hbox with 10px padding between controls
-        HBox itemBox = new HBox(10);
+        // create Hbox with 10px padding between controls DC 4//26/2023
+        HBox teamBox = new HBox(10);
         
-        // create button control with text Add
-        Button addButton = new Button("Generate Report");
-        // set event handler for cliking Button control to call addButtonClicked method
-        addButton.setOnAction(event-> addButtonClicked());
+        // fill tem combo with teams in db DC 4//26/2023
+        fillTeamCombo(teamCB, teams);
         
-        // add label, text input field and addButton to itemBox (Hbox)
-        itemBox.getChildren().add(teamPromptLabel);
-        itemBox.getChildren().add(itemField);
-        itemBox.getChildren().add(addButton);
+        teamCB.setPromptText(StringUtil.padWithSpaces("SELECT TEAM", 50));
+        playerCB.setPromptText(StringUtil.padWithSpaces("NEW PLAYER", 50));
         
-        // create new Hbox listViewBox
-        HBox listViewBox = new HBox(10);        
-        // groceryListView is a ListView here we set its preferred height
-        // to handle 5 items at 24px height for each
-        groceryListView.setPrefHeight(24 * 5);
-        // here we enable multiple selection for ListView
-        groceryListView.getSelectionModel()
-             .setSelectionMode(SelectionMode.MULTIPLE);
+        // create button control with text Pull player by team DC 4//26/2023
+        Button selectTeamButton = new Button(teamSelectButtonString);
         
-        // add label and ListView to listViewBox (Hbox)
-        listViewBox.getChildren().add(listViewLabel);
-        listViewBox.getChildren().add(groceryListView);
+        
+        // add label, comboBox and selectTeamButton to itemBox (Hbox) DC 4//26/2023
+        teamBox.getChildren().add(teamPromptLabel);
+        teamBox.getChildren().add(teamCB);
+        teamBox.getChildren().add(selectTeamButton);
+        // first fill hash dictionary of players based on teamSelected, then fill combo box DC 4//26/2023
+        selectTeamButton.setOnAction(event -> {players = fillPlayersHash(teamCB); fillPlayerCombo(playerCB,players); });
+        
+        // create new Hbox playerSelectBox DC 4//26/2023
+        HBox playerSelectBox = new HBox(10);        
+      
+        Button selectPlayerButton = new Button(playerSelectButtonString);
+        selectPlayerButton.setOnAction(event -> fillTextBoxes());
+        
+        // add label and combobox and button to playerSelectBox (Hbox) DC 4//26/2023
+        playerSelectBox.getChildren().add(playerLabel);
+        playerSelectBox.getChildren().add(playerCB);
+        playerSelectBox.getChildren().add(selectPlayerButton);
+        
+        // new HBOX for rows of data to enter DC 4//26/2023
+        HBox playerDataBox = new HBox(10);
+        
+        //set text to text boxes 4//26/2023
+        playerFirst.setText(StringUtil.padWithSpaces("First Name", 28));
+        playerLast.setText(StringUtil.padWithSpaces("Last Name", 28));
+        
+        
+        
+        // add labels and input fields DC 4//26/2023
+        playerDataBox.getChildren().add(new Label(playerFirstLabelString));
+        playerDataBox.getChildren().add(playerFirst);
+        playerDataBox.getChildren().add(new Label(playerLastLabelString));
+        playerDataBox.getChildren().add(playerLast);
+        playerDataBox.getChildren().add(processButton);
+        
         
         // create the final hbox to hold the buttons clear and remove
-        // 10 px padding between controls
+        // 10 px padding between controls DC 4//26/2023
         HBox buttonBox = new HBox(10);
-        // create clearButton with text Clear
+        // create clearButton with text Clear DC 4//26/2023
         Button clearButton = new Button("Clear");
         //set event handler to call method clearButtonClicked when clearButton
         // is clicked
-        clearButton.setOnAction(event -> clearButtonClicked());
+        //clearButton.setOnAction(event -> clearButtonClicked());
         
-        // create removeButton with text Remove
-        Button removeButton = new Button("Remove");
+        // create removeButton with text Remove DC 4//26/2023
+        Button removeButton = new Button("Remove"); 
         //this line was not orinally here, but we need event handler
-        // to call removeButtonClcked when the remove button is clicked
-        removeButton.setOnAction(event -> removeButtonClicked());
+        // to call removeButtonClcked when the remove button is clicked DC 4//26/2023
+        //removeButton.setOnAction(event -> removeButtonClicked());
         
         // mispelled buttonBx fixed to buttonBox this adds the two buttons
-        // to buttonBox(hbox)
+        // to buttonBox(hbox) DC 4//26/2023
         buttonBox.getChildren().add(clearButton);
         buttonBox.getChildren().add(removeButton);
         
         // now we add the three hboxes to the vbox we made up top
-        appContainer.getChildren().add(itemBox);
-        appContainer.getChildren().add(listViewBox);
+        appContainer.getChildren().add(teamBox);
+        appContainer.getChildren().add(playerSelectBox);
+        appContainer.getChildren().add(playerDataBox);
         appContainer.getChildren().add(buttonBox);
         
         // now we add vbox appContainer to GridPane object grid at col 0 
-        // and row 0. Also we are defining the column span as 2 and row span as 1
+        // and row 0. Also we are defining the column span as 2 and row span as 1 DC 4//26/2023
         grid.add(appContainer, 0, 0, 2, 1);
         
         // lower case s to set stage with scene object created above
         primaryStage.setScene(scene);
         // show the stage now that we have created scene, added root container layout
-        // and added all the desired sub layout objects and controls.
+        // and added all the desired sub layout objects and controls. DC 4//26/2023
         primaryStage.show();        
     }   
     
-    // handle clearButtonClicked when clear button is clicked and calls this
-    private void clearButtonClicked() {
-        // simple, call getItems() to return the list, then call clear to empty contents
-        groceryListView.getItems().clear();
+     // this method will take in a comboBox and fill it with the player positions in treemap players DC 4/26/2023
+    public static ComboBox<String> fillPlayerCombo(ComboBox<String> iterateBox, TreeMap<String, Integer> players) {
+        // loop through each element in game treemap to fill the comboBox we pass to this function DC 4/26/2023
+        // first add New Player as an option, then fill rest of combo box with players from DB
+        iterateBox.getItems().add("New Player");
+        for ( Map.Entry<String,Integer> element : players.entrySet()) {
+            iterateBox.getItems().add(element.getKey());
+        }
+        
+        return iterateBox;
     }
     
-    private void removeButtonClicked() {
-        // this creates a List of string type to collect the values of the selected items
-        // for ListView
-        List<String> selectedItems = groceryListView.getSelectionModel().getSelectedItems();
-        //System.out.println(selectedItems);
-        // also need to know the list of all items in ListView whether selected or not
-        List<String> allItems = groceryListView.getItems();
-        //System.out.println("This is the list of items existing: " + allItems);
-        //if there are no selected items or if there are no items at all in ListView
-        // then display an alert box
-        if(selectedItems.isEmpty() || allItems.isEmpty()) {
-            // cant have alert upper case for name of alert object
-            // this creates Alert of Error type
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            // set header to Invalid Remove
-            alert.setHeaderText("Invalid Remove");
-            // tell us an item must be selected before hitting remove button
-            alert.setContentText("Must select an item before removing.");
-            // display and wait for user to close
-            alert.showAndWait(); 
-        } else { 
-            Object [] arrayString = selectedItems.toArray();
-            // ran into issue when using enhanced loop got inex out of bounds exception
-            // I believe this is because we were removing items from List somehow, this was causing iterator
-            // to skip over next item somehow. So I decided to take list and use toArray() method to create 
-            // an array of the string, then iterate over that and remove from groceryListView control that way
-            for(Object item : arrayString) {
-                
-                groceryListView.getItems().remove(item);
-                
+    // this method will take in a comboBox and fill it with the teams given an ArrayList DC 4/26/2023
+    public static ComboBox<String> fillTeamCombo(ComboBox<String> iterateBox, ArrayList<String> teams) {
+        // loop through each element in team ArrayList to fill the comboBox we pass to this function DC 4/26/2023
+        for ( String element : teams) {
+            iterateBox.getItems().add(element);
+        }
+        
+        return iterateBox;
+    }
+    
+     // this method will create hash map, fill it based on id in teamBox and then return filled treemap DC 4/26/2023
+    public static TreeMap<String,Integer> fillPlayersHash( ComboBox<String> teamBox ) {
+        BatterDB nb = new BatterDB();
+        String teamID = teamBox.getSelectionModel().getSelectedItem();
+       
+        TreeMap<String, Integer> newTreeMap = nb.getPlayers(teamID);
+        
+        return newTreeMap;
+    }
+    
+    //this method handles when select player button is clicked DC 4/26/2023
+    public void fillTextBoxes()
+    {
+        BatterDB nb = new BatterDB();
+        // get player string
+        String playerString = this.playerCB.getSelectionModel().getSelectedItem();
+        
+        if(playerString.equalsIgnoreCase("New Player"))
+        {
+            // if new player want to fill text fields with enter new player first name and last name
+            this.playerFirst.setText("Enter new player's first name");
+            this.playerLast.setText("Enter new player's last name");
+            this.processButton.setText("Insert Player");
+        }
+        else
+        {
+            int playerID = this.players.get(playerString);
+            System.out.println(playerID);
+            Batter player = nb.returnPlayer(playerID);
+            if(player != null)
+            {
+                this.playerFirst.setText(player.getFirstName());
+                this.playerLast.setText(player.getLastName());
+                this.processButton.setText("Update Player");
             }
+            
         }
     }
-    // this handles clicking the addButton
-    private void addButtonClicked() {
-        // first we need to get the text typed in the input text field
-        String item = itemField.getText();
-        // then we create a list string and getitems on groceryListView
-        // this will get us the list of items already selected
-        List<String> items = groceryListView.getItems();
-        
-        // now we want to validate the entry create validation instance
-        // make it lower case v
-        Validation v = new Validation();  
-        // check for whether there is some text present in input text field
-        String errorMsg = v.isPresent(item, "Item");
-        // check it the item to be added is already in the items list, if
-        // so we do not want to add it again so inform us of this by adding
-        // text to errorMsg string
-        errorMsg += v.listHasValue(items, item, "Grocery List");
-        
-        // if both tests above pass, then errorMsg will remain empty and we 
-        // are safe to add the item to the ListView
-        if(errorMsg.isEmpty()) {
-            // add item to list view
-            items.add(item);
-            // clear out input text field by setting to "" to await another entry
-            itemField.setText("");
-        } else {
-            // otherwise if errorMsg had some kind of content then we want to 
-            // display an aler with the appropriate error msg alert name needs
-            // to be lowercase again so as not to confuse with the Alert object
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Invalid Entry");
-            alert.setContentText(errorMsg);
-            alert.showAndWait(); 
-        }
-    }
+    
+    // handle clearButtonClicked when clear button is clicked and calls this
+//    private void clearButtonClicked() {
+//        // simple, call getItems() to return the list, then call clear to empty contents
+//        groceryListView.getItems().clear();
+//    }
+    
+//    private void removeButtonClicked() {
+//        // this creates a List of string type to collect the values of the selected items
+//        // for ListView
+//        List<String> selectedItems = groceryListView.getSelectionModel().getSelectedItems();
+//        //System.out.println(selectedItems);
+//        // also need to know the list of all items in ListView whether selected or not
+//        List<String> allItems = groceryListView.getItems();
+//        //System.out.println("This is the list of items existing: " + allItems);
+//        //if there are no selected items or if there are no items at all in ListView
+//        // then display an alert box
+//        if(selectedItems.isEmpty() || allItems.isEmpty()) {
+//            // cant have alert upper case for name of alert object
+//            // this creates Alert of Error type
+//            Alert alert = new Alert(Alert.AlertType.ERROR);
+//            // set header to Invalid Remove
+//            alert.setHeaderText("Invalid Remove");
+//            // tell us an item must be selected before hitting remove button
+//            alert.setContentText("Must select an item before removing.");
+//            // display and wait for user to close
+//            alert.showAndWait(); 
+//        } else { 
+//            Object [] arrayString = selectedItems.toArray();
+//            // ran into issue when using enhanced loop got inex out of bounds exception
+//            // I believe this is because we were removing items from List somehow, this was causing iterator
+//            // to skip over next item somehow. So I decided to take list and use toArray() method to create 
+//            // an array of the string, then iterate over that and remove from groceryListView control that way
+//            for(Object item : arrayString) {
+//                
+//                groceryListView.getItems().remove(item);
+//                
+//            }
+//        }
+//    }
+//    // this handles clicking the addButton
+//    private void addButtonClicked() {
+//        // first we need to get the text typed in the input text field
+//        String item = itemField.getText();
+//        // then we create a list string and getitems on groceryListView
+//        // this will get us the list of items already selected
+//        List<String> items = groceryListView.getItems();
+//        
+//        // now we want to validate the entry create validation instance
+//        // make it lower case v
+//        Validation v = new Validation();  
+//        // check for whether there is some text present in input text field
+//        String errorMsg = v.isPresent(item, "Item");
+//        // check it the item to be added is already in the items list, if
+//        // so we do not want to add it again so inform us of this by adding
+//        // text to errorMsg string
+//        errorMsg += v.listHasValue(items, item, "Grocery List");
+//        
+//        // if both tests above pass, then errorMsg will remain empty and we 
+//        // are safe to add the item to the ListView
+//        if(errorMsg.isEmpty()) {
+//            // add item to list view
+//            items.add(item);
+//            // clear out input text field by setting to "" to await another entry
+//            itemField.setText("");
+//        } else {
+//            // otherwise if errorMsg had some kind of content then we want to 
+//            // display an aler with the appropriate error msg alert name needs
+//            // to be lowercase again so as not to confuse with the Alert object
+//            Alert alert = new Alert(Alert.AlertType.ERROR);
+//            alert.setHeaderText("Invalid Entry");
+//            alert.setContentText(errorMsg);
+//            alert.showAndWait(); 
+//        }
+//    }
 //    // this is the driver main method for the whole GUI class here
 //    // need to call launch here so it calls start with a stage
 //    public static void main(String[] args) {
