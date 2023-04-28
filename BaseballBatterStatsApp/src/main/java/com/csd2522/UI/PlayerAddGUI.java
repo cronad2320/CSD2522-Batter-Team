@@ -41,7 +41,7 @@ import java.util.TreeMap;
  * Updates : 4/26/2023 DC added elements to fill GUI and built some fill methods to fill combo boxes
  * Updates: 4/27/2023 DC Got Insert and Update into DB to work, added some validation with display error boxes
  * Updates: 4/28/2023 DC Add header labels to help user know what the current player selection is. This will help when 
- * they try to update or delete to know exactly who they are updating, and what their status is.
+ * they try to update or delete to know exactly who they are updating, and what their status is. Also, added team option.
  */
 public class PlayerAddGUI extends Application {
     //set String for Select Team string
@@ -51,14 +51,18 @@ public class PlayerAddGUI extends Application {
     String playerSelectButtonString = StringUtil.padWithSpaces("SELECT Player",teamSelectButtonString.length()+4);
     String playerFirstLabelString = StringUtil.padWithSpacesReverse("First Name", 25);
     String playerLastLabelString = StringUtil.padWithSpacesReverse("Last Name", 25);
-    String defaultID = StringUtil.padWithSpaces("\t\tNo ID Selected", 70); //formatted to get right
-    String defaultName = StringUtil.padWithSpaces("No Name Selected", 60);
+    String defaultID = StringUtil.padWithSpaces("\t\tPlayer ID: NONE", 70); //formatted to get right
+    String defaultName = StringUtil.padWithSpaces("Player Name: NONE", 60);
     String defaultProcessButtonString = StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5);
+    String insertPlayerString = StringUtil.padWithSpaces("Insert Player", teamSelectButtonString.length()+5);
+    String updatePlayerString = StringUtil.padWithSpaces("Update Player", teamSelectButtonString.length()+5);
+    String processEntry = StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5);
+    String teamIDLabelString = StringUtil.padWithSpacesReverse("Team List Selected: None", 140);
     
     // get DB instance
     private BatterDB db = new BatterDB();
     
-    // create different gui controls
+    // create different gui controls DC 4/28/2023
     private Label teamPromptLabel = new Label(selectTeamLabelString);
     private Label playerLabel = new Label(selectPlayerLabelString);
     private static ComboBox<String> playerCB = new ComboBox<>();
@@ -67,6 +71,8 @@ public class PlayerAddGUI extends Application {
     private static TextField playerLast = new TextField();
     private Label playerIDLabel = new Label(defaultID);
     private Label playerNameLabel = new Label(defaultName);
+    private Label teamIDLabel = new Label(teamIDLabelString);
+    
     
     private Button processButton = new Button(defaultProcessButtonString);
     // data structures to hold players and teams (will use these for getting values for SQL later)
@@ -119,6 +125,12 @@ public class PlayerAddGUI extends Application {
         // first fill hash dictionary of players based on teamSelected, then fill combo box DC 4//26/2023
         selectTeamButton.setOnAction(event -> {players = fillPlayersHash(teamCB); fillPlayerCombo(playerCB,players); });
         
+        //create team label HBox so we know status of players pulls DC 4/28/2023
+        HBox teamPulledBox = new HBox(10);
+        
+        // add label to hbox DC 4/28/2023
+        teamPulledBox.getChildren().add(teamIDLabel);
+        
         // create new Hbox playerSelectBox DC 4//26/2023
         HBox playerSelectBox = new HBox(10);        
       
@@ -167,10 +179,10 @@ public class PlayerAddGUI extends Application {
         clearButton.setOnAction(event -> resetForm());
         
         // create removeButton with text Remove DC 4//26/2023
-        Button removeButton = new Button("Remove"); 
+        Button removeButton = new Button("DELETE"); 
         //this line was not orinally here, but we need event handler
         // to call removeButtonClcked when the remove button is clicked DC 4//26/2023
-        //removeButton.setOnAction(event -> removeButtonClicked());
+        removeButton.setOnAction(event -> deletePlayer());
         
         // mispelled buttonBx fixed to buttonBox this adds the two buttons
         // to buttonBox(hbox) DC 4//26/2023
@@ -179,6 +191,7 @@ public class PlayerAddGUI extends Application {
         
         // now we add the three hboxes to the vbox we made up top
         appContainer.getChildren().add(teamBox);
+        appContainer.getChildren().add(teamPulledBox);
         appContainer.getChildren().add(playerSelectBox);
         appContainer.getChildren().add(playerChosen);
         appContainer.getChildren().add(playerDataBox);
@@ -196,7 +209,10 @@ public class PlayerAddGUI extends Application {
     }   
     
      // this method will take in a comboBox and fill it with the player positions in treemap players DC 4/26/2023
-    public static ComboBox<String> fillPlayerCombo(ComboBox<String> iterateBox, TreeMap<String, Integer> players) {
+    public ComboBox<String> fillPlayerCombo(ComboBox<String> iterateBox, TreeMap<String, Integer> players) {
+        
+        //get team name in string
+        String teamName = teamCB.getSelectionModel().getSelectedItem();
         
         // added validation using diplay boxes to prompt user for correct sequence and entry of material DC 4/27/2023
         if(players.size() != 0)    
@@ -213,6 +229,10 @@ public class PlayerAddGUI extends Application {
             for ( Map.Entry<String,Integer> element : players.entrySet()) {
                 iterateBox.getItems().add(element.getKey());
             }
+            // if size greater than zero want to display team
+            teamIDLabel.setText(StringUtil.padWithSpacesReverse("Team List Selected: "+ teamName + "\tTeam size: " + players.size(), 140));
+            
+            
         }
         else
         {
@@ -224,12 +244,18 @@ public class PlayerAddGUI extends Application {
                 // since we picked an empty team want to clear combo box, then re add Insert New Player so we can start adding player if desired.
                 playerCB.getItems().clear();
                 playerCB.getItems().add("Insert New Player");
+                
+                // if size is zero, but we have valid team then still want to let us know
+                teamIDLabel.setText(StringUtil.padWithSpacesReverse("Team List Selected: "+ teamName + "\tTeam size: " + players.size(), 140));
             }
             else
             {
                 PlayerAddGUI.displayAlertError("Make a team selection then click pull players by team !", "Make a team selection");
             }
         }
+        
+        
+        
         return iterateBox;
     }
     
@@ -277,7 +303,7 @@ public class PlayerAddGUI extends Application {
             // if new player want to fill text fields with enter new player first name and last name
             this.playerFirst.setText("Enter new player's first name");
             this.playerLast.setText("Enter new player's last name");
-            this.processButton.setText("Insert Player");
+            this.processButton.setText(insertPlayerString);
             playerNameLabel.setText(playerStringName);
             playerIDLabel.setText(playerStringID);
         }
@@ -290,9 +316,9 @@ public class PlayerAddGUI extends Application {
             {
                 this.playerFirst.setText(player.getFirstName());
                 this.playerLast.setText(player.getLastName());
-                this.processButton.setText("Update Player");
+                this.processButton.setText(updatePlayerString);
                  // build text string for new player, then add to labels DC 4/27/2023
-                String playerStringID = StringUtil.padWithSpaces("\t\tCurrent Player ID: " + player.getPlayerID() + " Current Team: " + player.getTeam(), 70); 
+                String playerStringID = StringUtil.padWithSpaces("\t\tPlayer ID: " + player.getPlayerID() + " Current Team: " + player.getTeam(), 70); 
                 String playerStringName = StringUtil.padWithSpaces("Player Name: " + player.getFirstName() + " " + player.getLastName(), 60);
                 playerNameLabel.setText(playerStringName);
                 playerIDLabel.setText(playerStringID);
@@ -303,7 +329,7 @@ public class PlayerAddGUI extends Application {
     //this function will validate and perform either insert or update statement
     public void processPlayer()
     {
-        if(this.processButton.getText().equals(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5)))
+        if(this.processButton.getText().equals(processEntry))
         {
             PlayerAddGUI.displayAlertError("Make sure to pick team you want to add player to or update to, then select player entry type!","Incomplete Entry");
         }
@@ -314,7 +340,7 @@ public class PlayerAddGUI extends Application {
             String team = teamCB.getSelectionModel().getSelectedItem();
 
             //check if label equals update player
-            if(processButton.getText().equalsIgnoreCase("Update Player"))
+            if(processButton.getText().equalsIgnoreCase(updatePlayerString))
             {
                 String key = playerCB.getSelectionModel().getSelectedItem();
 
@@ -323,19 +349,47 @@ public class PlayerAddGUI extends Application {
                 // create instance Batter with data from GUI
                 Batter updatePlayer = new Batter(playerID, fName, lName, team);
                 db.updatePlayer(updatePlayer);
-            } else if(processButton.getText().equalsIgnoreCase("Insert Player"))
+                // reset form after update DC 4/28/2023
+                resetForm();
+            } else if(processButton.getText().equalsIgnoreCase(insertPlayerString))
             {
                 
                 // create batter instance then pass to insertPlayer to add to db
                 Batter updatePlayer = new Batter(0, fName, lName, team);
                 
                 db.insertPlayer(updatePlayer);
-                
-                processButton.setText(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5));
+                // reset form after insert DC 4/28/2023
+                resetForm();
             }
         }
     }
-    
+    // this will delete selected player
+    public void deletePlayer()
+    {
+        // pull information, then use name entered in system to get key DC 4/28/2023
+        String fName = playerFirst.getText();
+        String lName = playerLast.getText();
+        String team = teamCB.getSelectionModel().getSelectedItem();
+        String key = playerLast.getText() + ", " + playerFirst.getText();
+        System.out.println("key: " + key);
+        // if player key we built is in players hash we have a match and are good to build the batter instance and pass to deletePlayer
+        // DC 4/28/2023
+        if(players.containsKey(key))
+        {
+            //build batter object
+            Batter delete = new Batter(players.get(key),fName,lName,team);
+            
+            //call delete
+            db.deletePlayer(delete);
+            //reset form
+            resetForm();
+        }
+        else
+        {
+            displayAlertError("Make sure that name in text fields match name\n in label above for delete to work!", "Error Deleting Player");
+        }
+        
+    }
     
     // this will displayAlertError if needed DC 4/27/2023
     public static void displayAlertError(String err, String header)
@@ -370,85 +424,6 @@ public class PlayerAddGUI extends Application {
         
     }
     
-    // handle clearButtonClicked when clear button is clicked and calls this
-//    private void clearButtonClicked() {
-//        // simple, call getItems() to return the list, then call clear to empty contents
-//        groceryListView.getItems().clear();
-//    }
     
-//    private void removeButtonClicked() {
-//        // this creates a List of string type to collect the values of the selected items
-//        // for ListView
-//        List<String> selectedItems = groceryListView.getSelectionModel().getSelectedItems();
-//        //System.out.println(selectedItems);
-//        // also need to know the list of all items in ListView whether selected or not
-//        List<String> allItems = groceryListView.getItems();
-//        //System.out.println("This is the list of items existing: " + allItems);
-//        //if there are no selected items or if there are no items at all in ListView
-//        // then display an alert box
-//        if(selectedItems.isEmpty() || allItems.isEmpty()) {
-//            // cant have alert upper case for name of alert object
-//            // this creates Alert of Error type
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            // set header to Invalid Remove
-//            alert.setHeaderText("Invalid Remove");
-//            // tell us an item must be selected before hitting remove button
-//            alert.setContentText("Must select an item before removing.");
-//            // display and wait for user to close
-//            alert.showAndWait(); 
-//        } else { 
-//            Object [] arrayString = selectedItems.toArray();
-//            // ran into issue when using enhanced loop got inex out of bounds exception
-//            // I believe this is because we were removing items from List somehow, this was causing iterator
-//            // to skip over next item somehow. So I decided to take list and use toArray() method to create 
-//            // an array of the string, then iterate over that and remove from groceryListView control that way
-//            for(Object item : arrayString) {
-//                
-//                groceryListView.getItems().remove(item);
-//                
-//            }
-//        }
-//    }
-//    // this handles clicking the addButton
-//    private void addButtonClicked() {
-//        // first we need to get the text typed in the input text field
-//        String item = itemField.getText();
-//        // then we create a list string and getitems on groceryListView
-//        // this will get us the list of items already selected
-//        List<String> items = groceryListView.getItems();
-//        
-//        // now we want to validate the entry create validation instance
-//        // make it lower case v
-//        Validation v = new Validation();  
-//        // check for whether there is some text present in input text field
-//        String errorMsg = v.isPresent(item, "Item");
-//        // check it the item to be added is already in the items list, if
-//        // so we do not want to add it again so inform us of this by adding
-//        // text to errorMsg string
-//        errorMsg += v.listHasValue(items, item, "Grocery List");
-//        
-//        // if both tests above pass, then errorMsg will remain empty and we 
-//        // are safe to add the item to the ListView
-//        if(errorMsg.isEmpty()) {
-//            // add item to list view
-//            items.add(item);
-//            // clear out input text field by setting to "" to await another entry
-//            itemField.setText("");
-//        } else {
-//            // otherwise if errorMsg had some kind of content then we want to 
-//            // display an aler with the appropriate error msg alert name needs
-//            // to be lowercase again so as not to confuse with the Alert object
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setHeaderText("Invalid Entry");
-//            alert.setContentText(errorMsg);
-//            alert.showAndWait(); 
-//        }
-//    }
-//    // this is the driver main method for the whole GUI class here
-//    // need to call launch here so it calls start with a stage
-//    public static void main(String[] args) {
-//        // start gui app
-//        launch();
-//    }
 }
 
