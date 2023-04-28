@@ -354,4 +354,45 @@ public class BatterDB {
             System.out.println(e);
         }    
     }
+    
+      // returns an ArrayList of all the seasons(years) in the Games table GAGE 
+    public static ArrayList<String> getSeasons(){
+        ArrayList<String> seasonsList = new ArrayList<>();
+        boolean matchFound = false;
+
+        try(Statement statement = connection.createStatement())            
+        {
+            ResultSet rs = statement.executeQuery("SELECT Game_date FROM Games");
+
+            while(rs.next()){
+                String unsplit = rs.getString(1);
+
+                String[] split = unsplit.split("-");
+                matchFound = false;
+                if(seasonsList.size() > 0){
+                    for(String x : seasonsList){
+                        if(x.equals(split[0])){
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(matchFound == false){
+                    seasonsList.add(split[0]);
+                }
+            }
+
+            rs.close();
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling seasons");
+            System.out.println(e);
+        }    
+        // sort so teams list is nicely sorted DC 4/26/2023.
+        Collections.sort(seasonsList);
+        return seasonsList;
+    } 
+
 }
