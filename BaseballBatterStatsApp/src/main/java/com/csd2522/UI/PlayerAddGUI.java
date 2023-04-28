@@ -182,7 +182,7 @@ public class PlayerAddGUI extends Application {
         Button removeButton = new Button("DELETE"); 
         //this line was not orinally here, but we need event handler
         // to call removeButtonClcked when the remove button is clicked DC 4//26/2023
-        //removeButton.setOnAction(event -> removeButtonClicked());
+        removeButton.setOnAction(event -> deletePlayer());
         
         // mispelled buttonBx fixed to buttonBox this adds the two buttons
         // to buttonBox(hbox) DC 4//26/2023
@@ -370,8 +370,8 @@ public class PlayerAddGUI extends Application {
         String fName = playerFirst.getText();
         String lName = playerLast.getText();
         String team = teamCB.getSelectionModel().getSelectedItem();
-        String key = playerLast.getText() + ", " + playerLast.getText();
-        
+        String key = playerLast.getText() + ", " + playerFirst.getText();
+        System.out.println("key: " + key);
         // if player key we built is in players hash we have a match and are good to build the batter instance and pass to deletePlayer
         // DC 4/28/2023
         if(players.containsKey(key))
@@ -383,6 +383,10 @@ public class PlayerAddGUI extends Application {
             db.deletePlayer(delete);
             //reset form
             resetForm();
+        }
+        else
+        {
+            displayAlertError("Make sure that name in text fields match name\n in label above for delete to work!", "Error Deleting Player");
         }
         
     }
@@ -420,85 +424,6 @@ public class PlayerAddGUI extends Application {
         
     }
     
-    // handle clearButtonClicked when clear button is clicked and calls this
-//    private void clearButtonClicked() {
-//        // simple, call getItems() to return the list, then call clear to empty contents
-//        groceryListView.getItems().clear();
-//    }
     
-//    private void removeButtonClicked() {
-//        // this creates a List of string type to collect the values of the selected items
-//        // for ListView
-//        List<String> selectedItems = groceryListView.getSelectionModel().getSelectedItems();
-//        //System.out.println(selectedItems);
-//        // also need to know the list of all items in ListView whether selected or not
-//        List<String> allItems = groceryListView.getItems();
-//        //System.out.println("This is the list of items existing: " + allItems);
-//        //if there are no selected items or if there are no items at all in ListView
-//        // then display an alert box
-//        if(selectedItems.isEmpty() || allItems.isEmpty()) {
-//            // cant have alert upper case for name of alert object
-//            // this creates Alert of Error type
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            // set header to Invalid Remove
-//            alert.setHeaderText("Invalid Remove");
-//            // tell us an item must be selected before hitting remove button
-//            alert.setContentText("Must select an item before removing.");
-//            // display and wait for user to close
-//            alert.showAndWait(); 
-//        } else { 
-//            Object [] arrayString = selectedItems.toArray();
-//            // ran into issue when using enhanced loop got inex out of bounds exception
-//            // I believe this is because we were removing items from List somehow, this was causing iterator
-//            // to skip over next item somehow. So I decided to take list and use toArray() method to create 
-//            // an array of the string, then iterate over that and remove from groceryListView control that way
-//            for(Object item : arrayString) {
-//                
-//                groceryListView.getItems().remove(item);
-//                
-//            }
-//        }
-//    }
-//    // this handles clicking the addButton
-//    private void addButtonClicked() {
-//        // first we need to get the text typed in the input text field
-//        String item = itemField.getText();
-//        // then we create a list string and getitems on groceryListView
-//        // this will get us the list of items already selected
-//        List<String> items = groceryListView.getItems();
-//        
-//        // now we want to validate the entry create validation instance
-//        // make it lower case v
-//        Validation v = new Validation();  
-//        // check for whether there is some text present in input text field
-//        String errorMsg = v.isPresent(item, "Item");
-//        // check it the item to be added is already in the items list, if
-//        // so we do not want to add it again so inform us of this by adding
-//        // text to errorMsg string
-//        errorMsg += v.listHasValue(items, item, "Grocery List");
-//        
-//        // if both tests above pass, then errorMsg will remain empty and we 
-//        // are safe to add the item to the ListView
-//        if(errorMsg.isEmpty()) {
-//            // add item to list view
-//            items.add(item);
-//            // clear out input text field by setting to "" to await another entry
-//            itemField.setText("");
-//        } else {
-//            // otherwise if errorMsg had some kind of content then we want to 
-//            // display an aler with the appropriate error msg alert name needs
-//            // to be lowercase again so as not to confuse with the Alert object
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setHeaderText("Invalid Entry");
-//            alert.setContentText(errorMsg);
-//            alert.showAndWait(); 
-//        }
-//    }
-//    // this is the driver main method for the whole GUI class here
-//    // need to call launch here so it calls start with a stage
-//    public static void main(String[] args) {
-//        // start gui app
-//        launch();
-//    }
 }
 
