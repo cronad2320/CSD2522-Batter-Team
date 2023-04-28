@@ -319,39 +319,66 @@ public class BatterDB {
 //        }    
 //    }
 //    
-//     // add new task to the database, only need description
-//    public void insertTask(int t) { 
-//        //String to build sql insert for PreparedStatement
-//        String insertTask = "INSERT INTO Task (description, completed)"
-//                + "VALUES(?,?)";
-//        // build PreparedStatement object with string above
-//        try(PreparedStatement ps = connection.prepareStatement(insertTask))            
-//        {
-//            
-//            // define paramter values then execute SQL statement
-//            ps.setString(1, t);
-//            
-//            int complete = 0;
-//            //get value from bool set integer based on result
-//            if(t.isCompleted())
-//            {
-//                //this should never happen by default, but in case it does
-//                // we will want to make complete equal to 1
-//                complete = 0;
-//            }
-//            // set complete field to result of complete int
-//            ps.setInt(2, complete);
-//            // execute insert based on task t data variables
-//            ps.executeUpdate();
-//            //add line whitespace
-//            System.out.println();
-//        }
-//        catch (SQLException e)
-//        {        
-//            System.out.println(e);
-//        }    
-//        
-//    }
+    // add player to DB DC 4/27/2023
+    public void insertPlayer(Batter playerUpdate) { 
+        //String to build sql insert for PreparedStatement
+        String insertTask = "INSERT INTO Players (Player_last_name, Player_first_name, Player_team_id)"
+                + "VALUES(?,?,?)";
+        
+        // get player information from Batter class to perform insert on Players table DC 4/27/2023
+        String playerFirst = playerUpdate.getFirstName();
+        String playerLast = playerUpdate.getLastName();
+        String team = playerUpdate.getTeam();
+        // build PreparedStatement object with string above
+        try(PreparedStatement ps = connection.prepareStatement(insertTask))            
+        {
+            
+            // define paramter values then execute SQL statement DC 4/27/2023
+            ps.setString(1, playerLast);
+            ps.setString(2, playerFirst);
+            ps.setString(3, team);
+            
+           
+            ps.executeUpdate();
+            
+        }
+        catch (SQLException e)
+        {        
+            System.out.println(e);
+        }    
+        
+    }
+        // this will update player id attached Batter instance with the other information attached to object DC 4/27/2023
+        public void updatePlayer(Batter playerUpdate) { 
+        //String to build sql insert for PreparedStatement
+        String updatePlayer = "UPDATE Players SET Player_last_name =?, Player_first_name=?, Player_team_id=?"
+                + " WHERE Player_id =?";
+        // get player information from Batter class to perform update on Players table DC 4/27/2023
+        int playerID = playerUpdate.getPlayerID();
+        String playerFirst = playerUpdate.getFirstName();
+        String playerLast = playerUpdate.getLastName();
+        String team = playerUpdate.getTeam();
+        
+        // build PreparedStatement object with string above
+        try(PreparedStatement ps = connection.prepareStatement(updatePlayer))            
+        {
+            
+            // define paramter values then execute SQL statement 4/27/2023
+            ps.setString(1, playerLast);
+            ps.setString(2, playerFirst);
+            ps.setString(3, team);
+            ps.setInt(4, playerID);
+            
+           
+            ps.executeUpdate();
+            
+        }
+        catch (SQLException e)
+        {        
+            System.out.println(e);
+        }    
+        
+    }
 //    // want function to get the numTasks that are pending
 //    public int numPendingTasks()
 //    {

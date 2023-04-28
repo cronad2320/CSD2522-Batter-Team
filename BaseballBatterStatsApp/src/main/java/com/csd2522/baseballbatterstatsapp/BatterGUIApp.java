@@ -1,7 +1,7 @@
 /*
 Author: Batter Team Daniel Cronauer, Michael Mowad, Andrew McKee, Gage Ruf
 Date: 4/21/2023 added to project
-File: Console.java
+File: BatterGUIApp.java
 Purpose: Driver App, starts main window for App
 Update: Micael Mowad 4/25/2023 new GUI format for whole driver app
  */
@@ -68,7 +68,7 @@ public class BatterGUIApp extends Application {
         Button aggregateButton = new Button("Generate Aggregate Player Data");
         aggregateButton.setOnAction(event -> new AggregateStatGui().start(aggregateStage));
         
-        Button addPlayersButton = new Button("Add New Players");
+        Button addPlayersButton = new Button("Manage Players");
         addPlayersButton.setOnAction(event -> new PlayerAddGUI().start(playerStage) );
       
         // Add to grid
