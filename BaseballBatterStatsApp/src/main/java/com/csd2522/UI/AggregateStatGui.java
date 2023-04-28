@@ -69,6 +69,15 @@ public class AggregateStatGui extends Application{
         Button seasonButton = new Button("Generate Stats by Season and Team");
         seasonButton.setOnAction(event -> seasonButtonClicked());
         
+        // Sets startDateField text (prompt)
+        startDateField.setPromptText("Start Date(YYYY-DD-MM)");
+        // Sets endDateField text(prompt)
+        endDateField.setPromptText("End Date (YYYY-DD-MM)");
+        
+        // Sets the default value of teamIDBox
+        teamIDBox.getSelectionModel().select(0);
+        // Sets the default value of seasonBox
+        seasonBox.getSelectionModel().select(0);
         
         HBox teamBox = new HBox(10);
         teamBox.getChildren().add(teamIDLabel);
@@ -120,11 +129,12 @@ public class AggregateStatGui extends Application{
     }
     
     private void fillSeasons(){
-        ArrayList<String> seasons;
-        
-        // Nothing here yet
+        ArrayList<String> seasons = BatterDB.getSeasons();
         
         seasonBox.getItems().add("Year");
+        for(String x: seasons){
+            seasonBox.getItems().add(x);
+        }
     }
     
 }

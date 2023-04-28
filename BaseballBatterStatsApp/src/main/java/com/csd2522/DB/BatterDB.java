@@ -211,6 +211,7 @@ public class BatterDB {
         return players;
     }
     
+    // returns an ArrayList of all the the TeamIDs
     public static ArrayList<String> getTeamIDs(){
         ArrayList<String> teamIDList = new ArrayList<>();
         
@@ -233,6 +234,47 @@ public class BatterDB {
         Collections.sort(teamIDList);
         return teamIDList;
     }    
+    
+    // returns an ArrayList of all the seasons(years) in the Games table
+    public static ArrayList<String> getSeasons(){
+        ArrayList<String> seasonsList = new ArrayList<>();
+        boolean matchFound = false;
+        
+        try(Statement statement = connection.createStatement())            
+        {
+            ResultSet rs = statement.executeQuery("SELECT Game_date FROM Games");
+            
+            while(rs.next()){
+                String unsplit = rs.getString(1);
+                
+                String[] split = unsplit.split("-");
+                matchFound = false;
+                if(seasonsList.size() > 0){
+                    for(String x : seasonsList){
+                        if(x.equals(split[0])){
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if(matchFound == false){
+                    seasonsList.add(split[0]);
+                }
+            }
+            
+            rs.close();
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling teams");
+            System.out.println(e);
+        }    
+        // sort so teams list is nicely sorted DC 4/26/2023.
+        Collections.sort(seasonsList);
+        return seasonsList;
+    } 
+    
     // this method will start as test, print game information to console, then when complete, I will 
     // have it print to a file, just like the project requires DC 4/25/2023
     public void printGameToFile(int gameId) {
