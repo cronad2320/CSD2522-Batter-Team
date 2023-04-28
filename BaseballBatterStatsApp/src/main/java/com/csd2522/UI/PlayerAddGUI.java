@@ -39,6 +39,9 @@ import java.util.TreeMap;
  * @author team
  * Starting Daniel Cronauer 4/25/2023
  * Updates : 4/26/2023 DC added elements to fill GUI and built some fill methods to fill combo boxes
+ * Updates: 4/27/2023 DC Got Insert and Update into DB to work, added some validation with display error boxes
+ * Updates: 4/28/2023 DC Add header labels to help user know what the current player selection is. This will help when 
+ * they try to update or delete to know exactly who they are updating, and what their status is.
  */
 public class PlayerAddGUI extends Application {
     //set String for Select Team string
@@ -48,6 +51,9 @@ public class PlayerAddGUI extends Application {
     String playerSelectButtonString = StringUtil.padWithSpaces("SELECT Player",teamSelectButtonString.length()+4);
     String playerFirstLabelString = StringUtil.padWithSpacesReverse("First Name", 25);
     String playerLastLabelString = StringUtil.padWithSpacesReverse("Last Name", 25);
+    String defaultID = StringUtil.padWithSpaces("\t\tNo ID Selected", 70); //formatted to get right
+    String defaultName = StringUtil.padWithSpaces("No Name Selected", 60);
+    String defaultProcessButtonString = StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5);
     
     // get DB instance
     private BatterDB db = new BatterDB();
@@ -58,9 +64,11 @@ public class PlayerAddGUI extends Application {
     private static ComboBox<String> playerCB = new ComboBox<>();
     private static ComboBox<String> teamCB = new ComboBox<>();
     private static TextField playerFirst = new TextField();
-    private TextField playerLast = new TextField();
+    private static TextField playerLast = new TextField();
+    private Label playerIDLabel = new Label(defaultID);
+    private Label playerNameLabel = new Label(defaultName);
     
-    private Button processButton = new Button(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5));
+    private Button processButton = new Button(defaultProcessButtonString);
     // data structures to hold players and teams (will use these for getting values for SQL later)
     private static TreeMap<String,Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
@@ -125,6 +133,12 @@ public class PlayerAddGUI extends Application {
         //default to add Insert New Player
         playerCB.getItems().add("Insert New Player");
         
+        // new HBOX to give user idea of player currently selected DC 4/26/2023
+        HBox playerChosen = new HBox(10);
+        
+        playerChosen.getChildren().add(playerIDLabel);
+        playerChosen.getChildren().add(playerNameLabel);
+        
         // new HBOX for rows of data to enter DC 4//26/2023
         HBox playerDataBox = new HBox(10);
         
@@ -148,9 +162,9 @@ public class PlayerAddGUI extends Application {
         HBox buttonBox = new HBox(10);
         // create clearButton with text Clear DC 4//26/2023
         Button clearButton = new Button("Clear");
-        //set event handler to call method clearButtonClicked when clearButton
+        //set event handler to call method resetForm when clearButton
         // is clicked
-        //clearButton.setOnAction(event -> clearButtonClicked());
+        clearButton.setOnAction(event -> resetForm());
         
         // create removeButton with text Remove DC 4//26/2023
         Button removeButton = new Button("Remove"); 
@@ -166,6 +180,7 @@ public class PlayerAddGUI extends Application {
         // now we add the three hboxes to the vbox we made up top
         appContainer.getChildren().add(teamBox);
         appContainer.getChildren().add(playerSelectBox);
+        appContainer.getChildren().add(playerChosen);
         appContainer.getChildren().add(playerDataBox);
         appContainer.getChildren().add(buttonBox);
         
@@ -251,15 +266,20 @@ public class PlayerAddGUI extends Application {
         } else
         {
             // prompt user to select either a player or insert new player
-            PlayerAddGUI.displayAlertError("Either select Insert new player if you want to add new player to team, or select current player to update their information!", "Make a player selection!");
+            PlayerAddGUI.displayAlertError("Either select Insert new player if you want to add new player to team.\n Or select current player to update their information!", "Make a player selection!");
         }
         
         if(playerString.equalsIgnoreCase("Insert New Player"))
         {
+            // build text string for new player DC 4/27/2023
+            String playerStringID = StringUtil.padWithSpaces("\t\tNew ID to be created on insert", 70); 
+            String playerStringName = StringUtil.padWithSpaces("Insert Player First and Last Name then process", 60); 
             // if new player want to fill text fields with enter new player first name and last name
             this.playerFirst.setText("Enter new player's first name");
             this.playerLast.setText("Enter new player's last name");
             this.processButton.setText("Insert Player");
+            playerNameLabel.setText(playerStringName);
+            playerIDLabel.setText(playerStringID);
         }
         else if (!playerString.equals(""))
         {
@@ -271,6 +291,11 @@ public class PlayerAddGUI extends Application {
                 this.playerFirst.setText(player.getFirstName());
                 this.playerLast.setText(player.getLastName());
                 this.processButton.setText("Update Player");
+                 // build text string for new player, then add to labels DC 4/27/2023
+                String playerStringID = StringUtil.padWithSpaces("\t\tCurrent Player ID: " + player.getPlayerID() + " Current Team: " + player.getTeam(), 70); 
+                String playerStringName = StringUtil.padWithSpaces("Player Name: " + player.getFirstName() + " " + player.getLastName(), 60);
+                playerNameLabel.setText(playerStringName);
+                playerIDLabel.setText(playerStringID);
             }
             
         }
@@ -322,6 +347,29 @@ public class PlayerAddGUI extends Application {
         alert.setContentText(err);
         alert.showAndWait(); 
     }
+    // simple reset everything DC 4/28/2027
+    public void resetForm()
+    {
+        // reset selections in player combo box then add Insert New Player
+        // in case we run into tem with no players added. DC 4/28/2023
+        playerCB.getItems().clear();
+        playerCB.getItems().add("Insert New Player");
+        
+        //reset the input text boxes with player name info DC 4/28/2023
+        playerFirst.setText("");
+        playerLast.setText("");
+        
+        // set player selection labels to default DC 4/28/2023
+        playerIDLabel.setText(defaultID);
+        playerNameLabel.setText(defaultName);
+        
+        //set  processButton back to process entry text
+        processButton.setText(defaultProcessButtonString);
+        
+        teamCB.getSelectionModel().select(null);
+        
+    }
+    
     // handle clearButtonClicked when clear button is clicked and calls this
 //    private void clearButtonClicked() {
 //        // simple, call getItems() to return the list, then call clear to empty contents
