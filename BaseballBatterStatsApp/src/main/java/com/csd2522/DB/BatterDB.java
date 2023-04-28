@@ -267,7 +267,7 @@ public class BatterDB {
         }
         catch (SQLException e)
         {       
-            System.out.println("Error in query filling teams");
+            System.out.println("Error in query filling seasons");
             System.out.println(e);
         }    
         // sort so teams list is nicely sorted DC 4/26/2023.
