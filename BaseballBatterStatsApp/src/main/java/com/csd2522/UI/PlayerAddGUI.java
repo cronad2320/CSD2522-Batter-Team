@@ -55,14 +55,14 @@ public class PlayerAddGUI extends Application {
     // create different gui controls
     private Label teamPromptLabel = new Label(selectTeamLabelString);
     private Label playerLabel = new Label(selectPlayerLabelString);
-    private ComboBox<String> playerCB = new ComboBox<>();
-    private ComboBox<String> teamCB = new ComboBox<>();
-    private TextField playerFirst = new TextField();
+    private static ComboBox<String> playerCB = new ComboBox<>();
+    private static ComboBox<String> teamCB = new ComboBox<>();
+    private static TextField playerFirst = new TextField();
     private TextField playerLast = new TextField();
     
     private Button processButton = new Button(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5));
     // data structures to hold players and teams (will use these for getting values for SQL later)
-    private TreeMap<String,Integer> players = new TreeMap<>();
+    private static TreeMap<String,Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
     
     // This is the start method for JavaFX it handles creation of scene, stage
@@ -98,7 +98,7 @@ public class PlayerAddGUI extends Application {
         fillTeamCombo(teamCB, teams);
         
         teamCB.setPromptText(StringUtil.padWithSpaces("SELECT TEAM", 50));
-        playerCB.setPromptText(StringUtil.padWithSpaces("NEW PLAYER", 50));
+        playerCB.setPromptText(StringUtil.padWithSpaces("SELECT PLAYER", 50));
         
         // create button control with text Pull player by team DC 4//26/2023
         Button selectTeamButton = new Button(teamSelectButtonString);
@@ -122,6 +122,9 @@ public class PlayerAddGUI extends Application {
         playerSelectBox.getChildren().add(playerCB);
         playerSelectBox.getChildren().add(selectPlayerButton);
         
+        //default to add Insert New Player
+        playerCB.getItems().add("Insert New Player");
+        
         // new HBOX for rows of data to enter DC 4//26/2023
         HBox playerDataBox = new HBox(10);
         
@@ -138,6 +141,7 @@ public class PlayerAddGUI extends Application {
         playerDataBox.getChildren().add(playerLast);
         playerDataBox.getChildren().add(processButton);
         
+        processButton.setOnAction(event-> processPlayer());
         
         // create the final hbox to hold the buttons clear and remove
         // 10 px padding between controls DC 4//26/2023
@@ -178,13 +182,39 @@ public class PlayerAddGUI extends Application {
     
      // this method will take in a comboBox and fill it with the player positions in treemap players DC 4/26/2023
     public static ComboBox<String> fillPlayerCombo(ComboBox<String> iterateBox, TreeMap<String, Integer> players) {
-        // loop through each element in game treemap to fill the comboBox we pass to this function DC 4/26/2023
-        // first add New Player as an option, then fill rest of combo box with players from DB
-        iterateBox.getItems().add("New Player");
-        for ( Map.Entry<String,Integer> element : players.entrySet()) {
-            iterateBox.getItems().add(element.getKey());
-        }
         
+        // added validation using diplay boxes to prompt user for correct sequence and entry of material DC 4/27/2023
+        if(players.size() != 0)    
+        {    
+            // first want to clear the combobox 4/27/2023
+            iterateBox.getItems().clear();
+
+
+            //fill in new player at top DC 4/27/2023
+            iterateBox.getItems().add("Insert New Player");
+            // loop through each element in game treemap to fill the comboBox we pass to this function DC 4/26/2023
+            // first add New Player as an option, then fill rest of combo box with players from DB
+
+            for ( Map.Entry<String,Integer> element : players.entrySet()) {
+                iterateBox.getItems().add(element.getKey());
+            }
+        }
+        else
+        {
+            // getting here meant that player hash was empty which means either the team selected has no players added to DB yet, or no team was picked
+            // provide a displayAlert based on either condition! 4/27/2023
+            if(teamCB.getSelectionModel().getSelectedItem() != null)
+            {
+                PlayerAddGUI.displayAlertError("Team selection has no players, start by entering a player!", "No team players");
+                // since we picked an empty team want to clear combo box, then re add Insert New Player so we can start adding player if desired.
+                playerCB.getItems().clear();
+                playerCB.getItems().add("Insert New Player");
+            }
+            else
+            {
+                PlayerAddGUI.displayAlertError("Make a team selection then click pull players by team !", "Make a team selection");
+            }
+        }
         return iterateBox;
     }
     
@@ -213,19 +243,28 @@ public class PlayerAddGUI extends Application {
     {
         BatterDB nb = new BatterDB();
         // get player string
-        String playerString = this.playerCB.getSelectionModel().getSelectedItem();
+        String playerString = ""; 
         
-        if(playerString.equalsIgnoreCase("New Player"))
+        if(this.playerCB.getSelectionModel().getSelectedItem() != null)
+        {
+            playerString = this.playerCB.getSelectionModel().getSelectedItem();
+        } else
+        {
+            // prompt user to select either a player or insert new player
+            PlayerAddGUI.displayAlertError("Either select Insert new player if you want to add new player to team, or select current player to update their information!", "Make a player selection!");
+        }
+        
+        if(playerString.equalsIgnoreCase("Insert New Player"))
         {
             // if new player want to fill text fields with enter new player first name and last name
             this.playerFirst.setText("Enter new player's first name");
             this.playerLast.setText("Enter new player's last name");
             this.processButton.setText("Insert Player");
         }
-        else
+        else if (!playerString.equals(""))
         {
             int playerID = this.players.get(playerString);
-            System.out.println(playerID);
+            
             Batter player = nb.returnPlayer(playerID);
             if(player != null)
             {
@@ -236,7 +275,53 @@ public class PlayerAddGUI extends Application {
             
         }
     }
+    //this function will validate and perform either insert or update statement
+    public void processPlayer()
+    {
+        if(this.processButton.getText().equals(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5)))
+        {
+            PlayerAddGUI.displayAlertError("Make sure to pick team you want to add player to or update to, then select player entry type!","Incomplete Entry");
+        }
+        else
+        {
+            String fName = playerFirst.getText();
+            String lName = playerLast.getText();
+            String team = teamCB.getSelectionModel().getSelectedItem();
+
+            //check if label equals update player
+            if(processButton.getText().equalsIgnoreCase("Update Player"))
+            {
+                String key = playerCB.getSelectionModel().getSelectedItem();
+
+                int playerID = players.get(key);
+                
+                // create instance Batter with data from GUI
+                Batter updatePlayer = new Batter(playerID, fName, lName, team);
+                db.updatePlayer(updatePlayer);
+            } else if(processButton.getText().equalsIgnoreCase("Insert Player"))
+            {
+                
+                // create batter instance then pass to insertPlayer to add to db
+                Batter updatePlayer = new Batter(0, fName, lName, team);
+                
+                db.insertPlayer(updatePlayer);
+                
+                processButton.setText(StringUtil.padWithSpaces("Process Entry", teamSelectButtonString.length()+5));
+            }
+        }
+    }
     
+    
+    // this will displayAlertError if needed DC 4/27/2023
+    public static void displayAlertError(String err, String header)
+    {
+        // create Alert error type, set header and content, then show
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(err);
+        alert.showAndWait(); 
+    }
     // handle clearButtonClicked when clear button is clicked and calls this
 //    private void clearButtonClicked() {
 //        // simple, call getItems() to return the list, then call clear to empty contents
