@@ -4,6 +4,7 @@ Date: 4/21/2023 added to project
 File: BatterGUIApp.java
 Purpose: Driver App, starts main window for App
 Update: Micael Mowad 4/25/2023 new GUI format for whole driver app
+Update: DC 4/29/2023 added displayAlertError function
  */
 
 package com.csd2522.baseballbatterstatsapp;
@@ -21,7 +22,9 @@ import java.util.HashMap;
 import com.csd2522.DB.BatterDB;
 import com.csd2522.UI.PlayerAddGUI;
 import com.csd2522.UI.AggregateStatGui;
+import com.csd2522.ValidationFormat.Validation;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 
 
 
@@ -106,6 +109,7 @@ public class BatterGUIApp extends Application {
     //this method takes in value from combobox and then calls printGameToFile with id came from hashmap as match for value in combobox 4/25/2023
     public static void printGameReport(ComboBox<String> gameBox, HashMap<String, Integer> game)
     {
+        Validation v= new Validation();
         // create instance for DB connection DC 4/25/2023
         BatterDB db = new BatterDB();
         // check if there is value for HashMap if not do not do anything for now later dialog box DC 4/25/2023
@@ -121,6 +125,9 @@ public class BatterGUIApp extends Application {
 
             //pass gameID to printToFile DC 4/25/2023
             db.printGameToFile(gameID);   
+        } else
+        {
+            v.displayAlertError("Game ID not found, please  make sure a selction was made", "No game found");
         }
     }
         
