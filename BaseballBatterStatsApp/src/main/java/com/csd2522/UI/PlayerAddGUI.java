@@ -12,20 +12,15 @@ import com.csd2522.Batter.Batter;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import java.util.List;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import com.csd2522.baseballbatterstatsapp.*;
-import java.util.HashMap;
 import javafx.scene.control.ComboBox;
 import com.csd2522.DB.BatterDB;
 import java.util.ArrayList;
@@ -42,6 +37,8 @@ import java.util.TreeMap;
  * Updates: 4/27/2023 DC Got Insert and Update into DB to work, added some validation with display error boxes
  * Updates: 4/28/2023 DC Add header labels to help user know what the current player selection is. This will help when 
  * they try to update or delete to know exactly who they are updating, and what their status is. Also, added team option.
+ * Updates: 4/29/2023 DC finished up validation on processPlayer method. This way we do not send empty
+ * player names to the database
  */
 public class PlayerAddGUI extends Application {
     //set String for Select Team string
@@ -83,8 +80,8 @@ public class PlayerAddGUI extends Application {
     // and controls DC 4//26/2023
     @Override
     public void start(Stage primaryStage) {
-        
-        
+        Validation v = new Validation();
+               
         // title set
         primaryStage.setTitle("Insert or Update Player by Team");
         
@@ -210,7 +207,7 @@ public class PlayerAddGUI extends Application {
     
      // this method will take in a comboBox and fill it with the player positions in treemap players DC 4/26/2023
     public ComboBox<String> fillPlayerCombo(ComboBox<String> iterateBox, TreeMap<String, Integer> players) {
-        
+        Validation v = new Validation();
         //get team name in string
         String teamName = teamCB.getSelectionModel().getSelectedItem();
         
@@ -240,7 +237,7 @@ public class PlayerAddGUI extends Application {
             // provide a displayAlert based on either condition! 4/27/2023
             if(teamCB.getSelectionModel().getSelectedItem() != null)
             {
-                PlayerAddGUI.displayAlertError("Team selection has no players, start by entering a player!", "No team players");
+                v.displayAlertError("Team selection has no players, start by entering a player!", "No team players");
                 // since we picked an empty team want to clear combo box, then re add Insert New Player so we can start adding player if desired.
                 playerCB.getItems().clear();
                 playerCB.getItems().add("Insert New Player");
@@ -250,7 +247,7 @@ public class PlayerAddGUI extends Application {
             }
             else
             {
-                PlayerAddGUI.displayAlertError("Make a team selection then click pull players by team !", "Make a team selection");
+                v.displayAlertError("Make a team selection then click pull players by team !", "Make a team selection");
             }
         }
         
@@ -282,6 +279,7 @@ public class PlayerAddGUI extends Application {
     //this method handles when select player button is clicked DC 4/26/2023
     public void fillTextBoxes()
     {
+        Validation v = new Validation();
         BatterDB nb = new BatterDB();
         // get player string
         String playerString = ""; 
@@ -292,7 +290,7 @@ public class PlayerAddGUI extends Application {
         } else
         {
             // prompt user to select either a player or insert new player
-            PlayerAddGUI.displayAlertError("Either select Insert new player if you want to add new player to team.\n Or select current player to update their information!", "Make a player selection!");
+            v.displayAlertError("Either select Insert new player if you want to add new player to team.\n Or select current player to update their information!", "Make a player selection!");
         }
         
         if(playerString.equalsIgnoreCase("Insert New Player"))
@@ -329,16 +327,18 @@ public class PlayerAddGUI extends Application {
     //this function will validate and perform either insert or update statement
     public void processPlayer()
     {
+        Validation v = new Validation();
+        String fName = playerFirst.getText();
+        String lName = playerLast.getText();
+        String team = teamCB.getSelectionModel().getSelectedItem();
         if(this.processButton.getText().equals(processEntry))
         {
-            PlayerAddGUI.displayAlertError("Make sure to pick team you want to add player to or update to, then select player entry type!","Incomplete Entry");
+            v.displayAlertError("Make sure to pick team you want to add player to or update to, then select player entry type!","Incomplete Entry");
         }
-        else
+        // if first and last text field contain alpabet characters or blanks (size has to be over zero)
+        // and make sure that team has a value as well, if so continue processing
+        else if (v.isAlpha(fName) && v.isAlpha(lName) && v.isPresent(team))
         {
-            String fName = playerFirst.getText();
-            String lName = playerLast.getText();
-            String team = teamCB.getSelectionModel().getSelectedItem();
-
             //check if label equals update player
             if(processButton.getText().equalsIgnoreCase(updatePlayerString))
             {
@@ -361,11 +361,15 @@ public class PlayerAddGUI extends Application {
                 // reset form after insert DC 4/28/2023
                 resetForm();
             }
+        } else // otherwise display alert
+        {
+             v.displayAlertError("Fill name fields(alphabet and blanks only)\n and team must be selected", "Missing or incorrect entry");
         }
     }
     // this will delete selected player
     public void deletePlayer()
     {
+        Validation v = new Validation();
         // pull information, then use name entered in system to get key DC 4/28/2023
         String fName = playerFirst.getText();
         String lName = playerLast.getText();
@@ -386,28 +390,22 @@ public class PlayerAddGUI extends Application {
         }
         else
         {
-            displayAlertError("Make sure that name in text fields match name\n in label above for delete to work!", "Error Deleting Player");
+            v.displayAlertError("Player name must match the one listed\n on the label above. Try selecting player again to reset fields;\nthen delete.", "Incorrect name");
         }
         
     }
     
-    // this will displayAlertError if needed DC 4/27/2023
-    public static void displayAlertError(String err, String header)
-    {
-        // create Alert error type, set header and content, then show
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(header);
-        alert.setContentText(err);
-        alert.showAndWait(); 
-    }
+    
     // simple reset everything DC 4/28/2027
     public void resetForm()
     {
         // reset selections in player combo box then add Insert New Player
         // in case we run into tem with no players added. DC 4/28/2023
         playerCB.getItems().clear();
+        
         playerCB.getItems().add("Insert New Player");
+        
+        playerCB.getSelectionModel().clearSelection();
         
         //reset the input text boxes with player name info DC 4/28/2023
         playerFirst.setText("");
@@ -421,6 +419,10 @@ public class PlayerAddGUI extends Application {
         processButton.setText(defaultProcessButtonString);
         
         teamCB.getSelectionModel().select(null);
+        
+        teamIDLabel.setText(teamIDLabelString);
+        
+        teamCB.getSelectionModel().clearSelection();
         
     }
     
