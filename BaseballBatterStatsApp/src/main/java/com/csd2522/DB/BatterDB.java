@@ -12,6 +12,7 @@ import java.lang.StringBuilder;
 import java.util.Collections;
 import java.util.TreeMap;
 import com.csd2522.Batter.Batter;
+import com.csd2522.ValidationFormat.StringUtil;
 
 /**
  *
@@ -117,6 +118,70 @@ public class BatterDB {
             System.out.println(e);
         } 
         return player;
+    }
+    
+    // return array team 1 in index zero and team 2 in index 1 on DC 4/30/2023
+    public ArrayList<String> returnTeams(int gameID)
+    {
+        ArrayList<String> teams = new ArrayList<>();
+           try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_one_id FROM Games "
+                 + "WHERE Game_id =? "))            
+        {
+            
+            //tell us what the ? paramter will take value of teamId passed to this method this should filter players to ones assigned to team DC 4/30/2023
+            ps.setInt(1,gameID);
+            
+            // create ResultSet object DC 4/30/2023
+            ResultSet rs = ps.executeQuery();
+            
+            
+            rs.next();
+            // get variables to build get team object DC 4/30/2023
+            
+            String team = rs.getString(1);
+            
+            //add string to empty array list at index zero
+            teams.add(0,team);
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling team one");
+            System.out.println(e);
+        } 
+        
+          try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_two_id FROM Games "
+                 + "WHERE Game_id =? "))            
+        {
+            
+            //tell us what the ? paramter will take value of teamId passed to this method this should filter players to ones assigned to team DC 4/30/2023
+            ps.setInt(1,gameID);
+            
+            // create ResultSet object DC 4/30/2023
+            ResultSet rs = ps.executeQuery();
+            
+            
+            rs.next();
+            // get variables to build get team object DC 4/30/2023
+            
+            String team = rs.getString(1);
+            
+            //add string to empty array list at index one
+            teams.add(1,team);
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling team two");
+            System.out.println(e);
+        }    
+        return teams;  
     }
     
     
@@ -236,7 +301,15 @@ public class BatterDB {
     // this method will start as test, print game information to console, then when complete, I will 
     // have it print to a file, just like the project requires DC 4/25/2023
     public void printGameToFile(int gameId) {
-         try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_one_id, Game_team_two_id, Game_win_id, Game_team_one_score, Game_team_two_score, Game_date "
+       
+        // build nest array list, index 0 holds team one/away teams batters, index 1 holds team two/home teams batters DC 4/30/2023
+        ArrayList<ArrayList<Batter>> playersByTeam = batterStatsOneGame(gameId);
+        ArrayList<Batter> awayTeamPlayers = playersByTeam.get(0);
+        ArrayList<Batter> homeTeamPlayers = playersByTeam.get(1);
+        StringBuilder fileSB = new StringBuilder(2000);
+        String awayTeam = "";
+        String homeTeam = "";
+        try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_one_id, Game_team_two_id, Game_win_id, Game_team_one_score, Game_team_two_score, Game_date "
                  + "FROM Games WHERE Game_id =?"))            
         {
             //tell us what the ? paramter will take value of gameId passed to this method DC 4/25/2023
@@ -245,33 +318,86 @@ public class BatterDB {
             ResultSet rs = ps.executeQuery();
             
             //define stringbuilder object here so we can effiecinetly build string to print to console and later print to file
-            StringBuilder fileSB = new StringBuilder(500);
+            
             
             //as long as there is a result in result set we will continue going DC 4/25/2023
             while (rs.next())
             {
                 //use define variables for all the columns from select statement above DC 4/25/2023
-                String awayTeam = rs.getString(1);
-                String homeTeam = rs.getString(2);
+                awayTeam = rs.getString(1);
+                homeTeam = rs.getString(2);
                 String winTeam = rs.getString(3);
                 int awayScore = rs.getInt(4);
                 int homeScore = rs.getInt(5);
                 String gameDate = rs.getString(6);
                 
-                fileSB.append("The away team is:" + awayTeam + "\nThe home team is: " +homeTeam + "\nThe winning team is: " +winTeam + "\nThe away team scored: " + awayScore
-                + "\nThe home team scored: " +homeScore + "\nThe game was on: " + gameDate);
+                fileSB.append("The away team is:").append(awayTeam).append("\nThe home team is: ").append(homeTeam).append("\nThe winning team is: ").append(winTeam).append("\nThe away team scored: ").append(awayScore).append("\nThe home team scored: ").append(homeScore).append("\nThe game was on: ").append(gameDate);
             }
             
             rs.close();
             
-            //print string build object to console as test, in future we will just print this whole string to the file
-            System.out.println(fileSB.toString());
+            
         }
         catch (SQLException e)
         {       
             System.out.println("Error in query");
             System.out.println(e);
-        }    
+        }
+        
+        //Start with header for player stats build as string DC 4/30/2023
+        String headerLineStats =  "\nTeam Batting Stats for "+ awayTeam + StringUtil.padWithSpaces("\nPlayer",35) + "ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR\n";
+        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 72) + "\n");
+        
+        //now want to iterate over the away team DC 4/30/2023
+        for(Batter player : awayTeamPlayers)
+        {
+            // headline is first part
+            String playerHeadline = player.getLastName() + ", " + player.getFirstName() + " " + player.getPosition();
+            fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
+            // build stats string based on batter instance DC 4/30/2023
+            String playerStats = StringUtil.padWithSpacesReverse(""+player.getAB(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getRuns(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getHits(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getRbi(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getBb(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getSo(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getHp(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getFB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getSB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getTB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getHR(), 2) + " \n";
+            fileSB.append(playerStats);
+        }
+        //End away team
+        fileSB.append(StringUtil.repeatString("_", 72) + "\n");
+        
+        String headerLineStatsHome =  "\nTeam Batting Stats for "+ homeTeam + StringUtil.padWithSpaces("\nPlayer",35) + "ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR\n";
+        fileSB.append(headerLineStatsHome).append(StringUtil.repeatString("_", 72) + "\n");
+        
+        // fill home team/team two stats
+        for(Batter player : homeTeamPlayers)
+        {
+            // headline is first part
+            String playerHeadline = player.getLastName() + ", " + player.getFirstName() + " " + player.getPosition();
+            fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
+            // build stats string based on batter instance DC 4/30/2023
+            String playerStats = StringUtil.padWithSpacesReverse(""+player.getAB(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getRuns(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getHits(), 1) + "  "
+                    + StringUtil.padWithSpacesReverse(""+player.getRbi(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getBb(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getSo(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getHp(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getFB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getSB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getTB(), 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+player.getHR(), 2) + " \n";
+            fileSB.append(playerStats);
+        }
+        fileSB.append(StringUtil.repeatString("_", 72) + "\n");
+        
+        //print string build object to console as test, in future we will just print this whole string to the file
+        System.out.println(fileSB.toString());
     }
     
 
@@ -394,5 +520,164 @@ public class BatterDB {
         Collections.sort(seasonsList);
         return seasonsList;
     } 
+    /** 
+     * 
+     * @param gameID game id
+     * @param awayTeamID id of away team
+     * @param homeTeamID id of home team
+     * @return ArrayList with two away lists of Batters. One array holds away teams in zero index other holds home teams in index 1
+     * This method will take in a gameId and then provide an arraylist of two array lists that store the batter instances
+     * of each team. So we can iterator over this later to build the game id report
+     */
+    public ArrayList<ArrayList<Batter>> batterStatsOneGame(int gameID)
+    {
+        // need to define both teams in their own list to catch the players in the correct team for the report DC 4/30/2023.
+        ArrayList<Batter> awayTeamPlayers = new ArrayList<>();
+        ArrayList<Batter> homeTeamPlayers = new ArrayList<>();
+        ArrayList<ArrayList<Batter>> awayHomeArray = new ArrayList<>();
+        ArrayList<String> teams = returnTeams(gameID);
+        System.out.println(teams.get(0));
+        // first start with filling awayTeamPlayers DC 4/30/2023
+        try(PreparedStatement ps = connection.prepareStatement("SELECT Batter_stat_team_id, Batter_stat_player_id, Batter_stat_pos_id, "
+                + "Batter_stat_ab, Batter_stat_runs, Batter_stat_hits, Batter_stat_rbi, Batter_stat_bb, Batter_stat_so, Batter_stat_hbp,"
+                + " Batter_stat_FB, Batter_stat_SB, Batter_stat_TB, Batter_stat_hr, Batter_stat_total_bases"
+                 + " FROM Batter_Stats WHERE Batter_stat_game_id =? AND Batter_stat_team_id=?"))            
+        {
+            
+            //tell us what the ? paramter will take value of gameID and awayTeam passed to this method DC 4/30/2023
+            ps.setInt(1,gameID);
+            ps.setString(2, teams.get(0)); // away team is in team one id, else if nuetral game get team at index zero
+            // create ResultSet object DC 4/30/2023
+            ResultSet rs = ps.executeQuery();
+            
+            
+            
+            //as long as there is a result in result set we will continue going DC 4/30/2023
+            while (rs.next())
+            {
+                //use define variables for all the columns from select statement above DC 4/30/2023
+                String batterTeam = rs.getString(1);
+                int batterID = rs.getInt(2);
+                String position = rs.getString(3);
+                int atBat = rs.getInt(4);
+                int runs = rs.getInt(5);
+                int hits = rs.getInt(6);
+                int rbi = rs.getInt(7);
+                int bb = rs.getInt(8);
+                int so = rs.getInt(9);
+                int hbp = rs.getInt(10);
+                int fb = rs.getInt(11);
+                int sb = rs.getInt(12);
+                int tb = rs.getInt(13);
+                int hr = rs.getInt(14);
+                int totalBase = rs.getInt(15);
+                
+                //Build batter object based on player Id by using returnPlayer DC 4/20/2023
+                Batter currentBatter = this.returnPlayer(batterID);
+                
+                //now want to set various properties of batter based on results from select statement DC 4/30/2023
+                currentBatter.setTeam(batterTeam);
+                currentBatter.setPosition(position);
+                currentBatter.setAB(atBat);
+                currentBatter.setRuns(runs);
+                currentBatter.setHits(hits);
+                currentBatter.setRbi(rbi);
+                currentBatter.setBb(bb);
+                currentBatter.setSo(so);
+                currentBatter.setHp(hbp);
+                currentBatter.setFB(fb);
+                currentBatter.setSB(sb);
+                currentBatter.setTB(tb);
+                currentBatter.setHR(hr);
+                currentBatter.setTotalBase(totalBase);
+                
+                awayTeamPlayers.add(currentBatter);
+                
+                
+            }
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query away teams batter one");
+            System.out.println(e);
+        }
+        // this will add home team players and log their stats to batter instances DC 4/30/2023
+        try(PreparedStatement ps = connection.prepareStatement("SELECT Batter_stat_team_id, Batter_stat_player_id, Batter_stat_pos_id, "
+                + "Batter_stat_ab, Batter_stat_runs, Batter_stat_hits, Batter_stat_rbi, Batter_stat_bb, Batter_stat_so, Batter_stat_hbp, "
+                + "Batter_stat_FB, Batter_stat_SB, Batter_stat_TB, Batter_stat_hr, Batter_stat_total_bases "
+                 + "FROM Batter_Stats WHERE Batter_stat_game_id =? AND Batter_stat_team_id=?"))            
+        {
+            
+            //tell us what the ? paramter will take value of gameID and awayTeam passed to this method DC 4/30/2023
+            ps.setInt(1,gameID);
+            ps.setString(2, teams.get(1)); // get second element in teams array this represents home team or team two in nuetral game
+            // create ResultSet object DC 4/30/2023
+            ResultSet rs = ps.executeQuery();
+            
+            
+            
+            //as long as there is a result in result set we will continue going DC 4/30/2023
+            while (rs.next())
+            {
+                //use define variables for all the columns from select statement above DC 4/30/2023
+                String batterTeam = rs.getString(1);
+                int batterID = rs.getInt(2);
+                String position = rs.getString(3);
+                int atBat = rs.getInt(4);
+                int runs = rs.getInt(5);
+                int hits = rs.getInt(6);
+                int rbi = rs.getInt(7);
+                int bb = rs.getInt(8);
+                int so = rs.getInt(9);
+                int hbp = rs.getInt(10);
+                int fb = rs.getInt(11);
+                int sb = rs.getInt(12);
+                int tb = rs.getInt(13);
+                int hr = rs.getInt(14);
+                int totalBase = rs.getInt(15);
+                
+                //Build batter object based on player Id by using returnPlayer DC 4/20/2023
+                Batter currentBatter = this.returnPlayer(batterID);
+                
+                //now want to set various properties of batter based on results from select statement DC 4/30/2023
+                currentBatter.setTeam(batterTeam);
+                currentBatter.setPosition(position);
+                currentBatter.setAB(atBat);
+                currentBatter.setRuns(runs);
+                currentBatter.setHits(hits);
+                currentBatter.setRbi(rbi);
+                currentBatter.setBb(bb);
+                currentBatter.setSo(so);
+                currentBatter.setHp(hbp);
+                currentBatter.setFB(fb);
+                currentBatter.setSB(sb);
+                currentBatter.setTB(tb);
+                currentBatter.setHR(hr);
+                currentBatter.setTotalBase(totalBase);
+                
+                homeTeamPlayers.add(currentBatter);
+                
+                
+            }
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query home teams batter one ");
+            System.out.println(e);
+        }
+        awayHomeArray.add(0,awayTeamPlayers);
+        awayHomeArray.add(1,homeTeamPlayers);
+        
+        
+        return awayHomeArray;
+    }
 
 }
