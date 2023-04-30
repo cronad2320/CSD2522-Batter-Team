@@ -53,21 +53,21 @@ public class TeamLogGUI extends Application {
         topRow.getChildren().add(homeComboBox);
         topRow.getChildren().add(awayTeamLabel);
         topRow.getChildren().add(awayComboBox);
-        grid.add(topRow,0,0);
+       
         
         HBox middleRow = new HBox();
         middleRow.getChildren().add(homeScoreLabel);
         middleRow.getChildren().add(homeScoreTextField);
         middleRow.getChildren().add(awayScoreLabel);
         middleRow.getChildren().add(awayScoreTextField);
-        grid.add(middleRow,0,0);
+        
         
         HBox bottomRow = new HBox();
         bottomRow.getChildren().add(gameDateLabel);
         bottomRow.getChildren().add(gameDateBox);
         createGameButton.setOnAction(event -> createGameButtonClicked());
         bottomRow.getChildren().add(createGameButton);
-        grid.add(bottomRow,0,0);
+       
         
         grid.add(topRow,0,0);
         grid.add(middleRow,0,1);
