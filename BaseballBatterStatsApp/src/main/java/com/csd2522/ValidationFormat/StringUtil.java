@@ -55,4 +55,21 @@ public class StringUtil {
             return s.substring(0, length);
         }
     }
+    
+    /**
+     * @param s String that we we want to repeat
+     * @param length int that represents number of times to repeat
+     * @return String, this string will repeat however many times you specify
+     */
+    public static String repeatString(String s, int repeats) {
+       
+            StringBuilder sb = new StringBuilder(s.length()*repeats);
+            int count = 0;
+            while (count < repeats) {
+                sb.append(s);
+                count++;
+            }
+            return sb.toString();
+        
+    }
 }
