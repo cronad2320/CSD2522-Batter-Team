@@ -151,9 +151,9 @@ public class PlayerAddGUI extends Application {
         // new HBOX for rows of data to enter DC 4//26/2023
         HBox playerDataBox = new HBox(10);
         
-        //set text to text boxes 4//26/2023
-        playerFirst.setText(StringUtil.padWithSpaces("First Name", 28));
-        playerLast.setText(StringUtil.padWithSpaces("Last Name", 28));
+//        //set text to text boxes 4//26/2023
+//        playerFirst.setText(StringUtil.padWithSpaces("First Name", 28));
+//        playerLast.setText(StringUtil.padWithSpaces("Last Name", 28));
         
         
         
@@ -299,8 +299,8 @@ public class PlayerAddGUI extends Application {
             String playerStringID = StringUtil.padWithSpaces("\t\tNew ID to be created on insert", 70); 
             String playerStringName = StringUtil.padWithSpaces("Insert Player First and Last Name then process", 60); 
             // if new player want to fill text fields with enter new player first name and last name
-            this.playerFirst.setText("Enter new player's first name");
-            this.playerLast.setText("Enter new player's last name");
+            this.playerFirst.setPromptText("Enter new player's first name");
+            this.playerLast.setPromptText("Enter new player's last name");
             this.processButton.setText(insertPlayerString);
             playerNameLabel.setText(playerStringName);
             playerIDLabel.setText(playerStringID);
