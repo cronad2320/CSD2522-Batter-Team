@@ -22,6 +22,7 @@ import java.util.HashMap;
 import com.csd2522.DB.BatterDB;
 import com.csd2522.UI.PlayerAddGUI;
 import com.csd2522.UI.AggregateStatGui;
+import com.csd2522.UI.BatterStatsGUI;
 import com.csd2522.ValidationFormat.Validation;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
@@ -42,6 +43,7 @@ public class BatterGUIApp extends Application {
         //add new stage to call other ui pages DC 4/26/2023
         Stage playerStage = new Stage();
         Stage aggregateStage = new Stage();
+        Stage statStage = new Stage();
 
         //GridPane to attach items to
         GridPane mainPane = new GridPane();
@@ -63,7 +65,7 @@ public class BatterGUIApp extends Application {
         // newGameButton.setOnAction(event -> );
         
         Button batterStatsButton = new Button("Enter Batter Game Stats");
-        // batterStatsButton.setOnAction(event -> );
+        batterStatsButton.setOnAction(event -> new BatterStatsGUI().start(statStage));
         
         Button gameReportButton = new Button("Generate Game Report");
         gameReportButton.setOnAction(event -> printGameReport(gameSelect,games));
