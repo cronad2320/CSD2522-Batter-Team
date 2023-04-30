@@ -12,6 +12,7 @@ import java.lang.StringBuilder;
 import java.util.Collections;
 import java.util.TreeMap;
 import com.csd2522.Batter.Batter;
+import com.csd2522.FileOutput.FileOutPut;
 import com.csd2522.ValidationFormat.StringUtil;
 
 /**
@@ -309,6 +310,7 @@ public class BatterDB {
         StringBuilder fileSB = new StringBuilder(2000);
         String awayTeam = "";
         String homeTeam = "";
+        String gameDate = "";
         try(PreparedStatement ps = connection.prepareStatement("SELECT Game_team_one_id, Game_team_two_id, Game_win_id, Game_team_one_score, Game_team_two_score, Game_date "
                  + "FROM Games WHERE Game_id =?"))            
         {
@@ -329,7 +331,7 @@ public class BatterDB {
                 String winTeam = rs.getString(3);
                 int awayScore = rs.getInt(4);
                 int homeScore = rs.getInt(5);
-                String gameDate = rs.getString(6);
+                gameDate = rs.getString(6);
                 
                 fileSB.append("The away team is:").append(awayTeam).append("\nThe home team is: ").append(homeTeam).append("\nThe winning team is: ").append(winTeam).append("\nThe away team scored: ").append(awayScore).append("\nThe home team scored: ").append(homeScore).append("\nThe game was on: ").append(gameDate);
             }
@@ -398,6 +400,12 @@ public class BatterDB {
         
         //print string build object to console as test, in future we will just print this whole string to the file
         System.out.println(fileSB.toString());
+        
+        // create file name
+        String fileName = awayTeam + " vs " + homeTeam + " " + gameDate;
+        
+        //create file
+        FileOutPut.writeFile(fileSB.toString(),fileName);
     }
     
 
