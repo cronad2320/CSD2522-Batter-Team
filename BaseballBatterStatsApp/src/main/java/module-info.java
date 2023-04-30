@@ -3,4 +3,5 @@ module com.csd2522.baseballbatterstatsapp {
     exports com.csd2522.baseballbatterstatsapp;
     requires java.sql;
     requires org.xerial.sqlitejdbc;
+    
 }
