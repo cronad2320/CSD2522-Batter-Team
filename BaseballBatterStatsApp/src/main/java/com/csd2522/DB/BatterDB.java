@@ -687,5 +687,42 @@ public class BatterDB {
         
         return awayHomeArray;
     }
+    
+    /*
+    Author: Andrew McKee
+    Added: 5/1/2023
+    Purpose: Takes information entered by the user and enters it into Games
+    */
+    public void insertGame(String awayTeam, String homeTeam, int awayScore, int homeScore, String date) {
+        
+        // Makes a prepared statement
+        String sql = "INSERT INTO Games (Game_team_one_id, Game_team_two_id, Game_win_id, Game_team_one_score, Game_team_two_score, Game_date) "
+                + "VALUES (?,?,?,?,?,?)";
+        try(PreparedStatement ps = connection.prepareStatement(sql))            
+        {
+            
+            // Compares scores and declares the winner
+            String winningTeamName;
+            if (awayScore > homeScore) {
+                winningTeamName = awayTeam;
+            } else {
+                winningTeamName = homeTeam;
+            }
+           
+            // Enters information into Games
+            ps.setString(1, awayTeam);
+            ps.setString(2, homeTeam);
+            ps.setString(3, winningTeamName);
+            ps.setInt(4, awayScore);
+            ps.setInt(5, homeScore);
+            ps.setString(6, date);
+            ps.executeUpdate();
+            ps.close();
+        }
+        catch (SQLException e)
+        {        
+            System.out.println(e);
+        }
+    }
 
 }
