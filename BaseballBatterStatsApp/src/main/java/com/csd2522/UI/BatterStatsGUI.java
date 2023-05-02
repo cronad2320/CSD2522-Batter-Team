@@ -13,11 +13,18 @@ import static com.csd2522.UI.PlayerAddGUI.fillTeamCombo;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -41,10 +48,26 @@ public class BatterStatsGUI extends Application{
     
     // get DB instance
     private BatterDB db = new BatterDB();
+    private static Connection connection;
+    private void connect() {
+    
+    try 
+        {
+            String dbUrl = "jdbc:sqlite:Batter.sqlite";
+            connection = DriverManager.getConnection(dbUrl);
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println("Connection Failed");
+            System.err.println(e);   
+        }    
+    }
+
     
     private final HashMap<String, Integer> games = db.getTeams();
     private static TreeMap<String,Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
+    
     
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
@@ -61,6 +84,26 @@ public class BatterStatsGUI extends Application{
    private ComboBox<String> playerSelect7 = new ComboBox<>();
    private ComboBox<String> playerSelect8 = new ComboBox<>();
    private ComboBox<String> playerSelect9 = new ComboBox<>();
+   
+   //Position select combo boxes
+   private ComboBox<String> positionSelect1 = new ComboBox<>();
+   private ComboBox<String> positionSelect2 = new ComboBox<>();
+   private ComboBox<String> positionSelect3 = new ComboBox<>();
+   private ComboBox<String> positionSelect4 = new ComboBox<>();
+   private ComboBox<String> positionSelect5 = new ComboBox<>();
+   private ComboBox<String> positionSelect6 = new ComboBox<>();
+   private ComboBox<String> positionSelect7 = new ComboBox<>();
+   private ComboBox<String> positionSelect8 = new ComboBox<>();
+   private ComboBox<String> positionSelect9 = new ComboBox<>();
+        
+                
+
+
+
+
+
+
+
    
    //Player 1
        TextField firstBField1 = new TextField();
@@ -200,15 +243,7 @@ public class BatterStatsGUI extends Application{
        primaryStage.setScene(scene);
        primaryStage.show();
        
-       //game select combo box
-        ComboBox<String> gameSelect = new ComboBox<>();
-        gameSelect.setPromptText("Select Game");
-        //fill gameSelect combo box 
-        fillGameCombo(gameSelect,games);
-        HBox buttonBox1 = new HBox(10);
-        buttonBox1.getChildren().add(gameSelect);
-        buttonBox1.getChildren().add(teamSelect);
-        grid.add(buttonBox1,0, 0,  4, 1);
+
         
         //Accept and clear buttons
         Button registerStatsButton = new Button("Register Stats");
@@ -236,32 +271,39 @@ public class BatterStatsGUI extends Application{
         playerSelect8.setPromptText("Select Player");
         playerSelect9.setPromptText("Select Player");
         
+        //Set prompt text for player select
+        positionSelect1.setPromptText("Position");
+        positionSelect2.setPromptText("Position");
+        positionSelect3.setPromptText("Position");
+        positionSelect4.setPromptText("Position");
+        positionSelect5.setPromptText("Position");
+        positionSelect6.setPromptText("Position");
+        positionSelect7.setPromptText("Position");
+        positionSelect8.setPromptText("Position");
+        positionSelect9.setPromptText("Position");
+        
         //Select Team button 
         // Player Select combo boxes are filled withing getPlayers 
         Button selectTeamButton = new Button ("Select Team");        
-        selectTeamButton.setOnAction(event -> {players = fillPHash(teamSelect); getPlayers(playerSelect1, players); });
-     
+        selectTeamButton.setOnAction(event -> {players = fillPHash(teamSelect); try {
+            getPlayers(playerSelect1, players);
+           } catch (SQLException ex) {
+               Logger.getLogger(BatterStatsGUI.class.getName()).log(Level.SEVERE, null, ex);
+           }
+});
+            //game select combo box
+        ComboBox<String> gameSelect = new ComboBox<>();
+        gameSelect.setPromptText("Select Game");
+        //fill gameSelect combo box 
+        fillGameCombo(gameSelect,games);
+        HBox buttonBox1 = new HBox(10);
+        buttonBox1.getChildren().add(gameSelect);
+        buttonBox1.getChildren().add(teamSelect);
+        buttonBox1.getChildren().add(selectTeamButton);
+        grid.add(buttonBox1,0, 0,  6, 1);
 
         
-        //Position select combo boxes
-        ComboBox<String> positionSelect1 = new ComboBox<>();
-        positionSelect1.setPromptText("Position");
-        ComboBox<String> positionSelect2 = new ComboBox<>();
-        positionSelect2.setPromptText("Position");
-        ComboBox<String> positionSelect3 = new ComboBox<>();
-        positionSelect3.setPromptText("Position");
-        ComboBox<String> positionSelect4 = new ComboBox<>();
-        positionSelect4.setPromptText("Position");
-        ComboBox<String> positionSelect5 = new ComboBox<>();
-        positionSelect5.setPromptText("Position");
-        ComboBox<String> positionSelect6 = new ComboBox<>();
-        positionSelect6.setPromptText("Position");
-        ComboBox<String> positionSelect7 = new ComboBox<>();
-        positionSelect7.setPromptText("Position");
-        ComboBox<String> positionSelect8 = new ComboBox<>();
-        positionSelect8.setPromptText("Position");
-        ComboBox<String> positionSelect9 = new ComboBox<>();
-        positionSelect9.setPromptText("Position");
+        
         
         
         //Positions 
@@ -883,11 +925,17 @@ public class BatterStatsGUI extends Application{
 
     }
 
-    public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) {
+    public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) throws SQLException {
         Validation v = new Validation();
         
         String teamName = teamSelect.getSelectionModel().getSelectedItem();
-        
+/*        String sql = "Select *"
+                + "from Batter_Stats"
+                + "Where Batter_stat_player_id = ?";
+       
+        PreparedStatement ps = connection.prepareStatement(sql);*/
+            
+            // create ResultSet object
         if(players.size() != 0)    
         {    
  
@@ -932,6 +980,9 @@ public class BatterStatsGUI extends Application{
     }
     
     public void registerStats() {
+        Validation v = new Validation();
+
+        
         
     }
         public void handle(ActionEvent event) {
