@@ -330,7 +330,15 @@ public class Batter {
            return -1; // this number is not allowed so we will know something is wrong. 
        }
     }
-
+    // calculate total bases then set total base with the value DC 5/4/2023
+    public int calculateBases()
+    {
+        int total = this.getFB() + this.getSB() + this.getTB() + this.getHR();
+        
+        this.setTotalBase(total);
+        
+        return total;
+    }
    
 
    

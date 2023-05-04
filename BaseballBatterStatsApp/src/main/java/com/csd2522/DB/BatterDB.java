@@ -413,7 +413,7 @@ public class BatterDB {
     public void insertPlayer(Batter playerUpdate) { 
         //String to build sql insert for PreparedStatement
         String insertTask = "INSERT INTO Players (Player_last_name, Player_first_name, Player_team_id)"
-                + "VALUES(?,?,?)";
+                + " VALUES(?,?,?)";
         
         // get player information from Batter class to perform insert on Players table DC 4/27/2023
         String playerFirst = playerUpdate.getFirstName();
@@ -487,6 +487,64 @@ public class BatterDB {
         {        
             System.out.println(e);
         }    
+    }
+    
+    //insert batter with all fields when filling out BatterStatsGui DC 5/4/2023
+    public void insertBatterStats(Batter currentBatter, int gameID)
+    {
+        
+
+        String team = currentBatter.getTeam();
+        String pos = currentBatter.getPosition();
+        int PlayerID = currentBatter.getPlayerID();
+        int ab = currentBatter.getAB();
+        int runs = currentBatter.getRuns();
+        int hits = currentBatter.getHits();
+        int rbi = currentBatter.getRbi();
+        int bb = currentBatter.getBb();
+        int so = currentBatter.getSo();
+        int hp = currentBatter.getHp();
+        int fb = currentBatter.getFB();
+        int sb = currentBatter.getSB();
+        int tb = currentBatter.getTB();
+        int hr = currentBatter.getHR();
+        int total = currentBatter.calculateBases();
+        
+        
+       
+        
+        try(PreparedStatement ps = connection.prepareStatement("INSERT INTO Batter_Stats "
+                + "(Batter_stat_team_id, Batter_stat_player_id, Batter_stat_pos_id, "
+                + "Batter_stat_ab, Batter_stat_runs, Batter_stat_hits, Batter_stat_rbi, Batter_stat_bb, Batter_stat_so, Batter_stat_hbp,"
+                + " Batter_stat_FB, Batter_stat_SB, Batter_stat_TB, Batter_stat_hr, Batter_stat_total_bases, Batter_stat_game_id)"
+                +" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"))            
+        {    
+                //use take variables derived from batter passed to method above to define the value to insert for each field in insert statement DC 5/4/2023
+                ps.setString(1,team);
+                ps.setInt(2,PlayerID);
+                ps.setString(3,pos);
+                ps.setInt(4,ab);
+                ps.setInt(5,runs);
+                ps.setInt(6,hits);
+                ps.setInt(7,rbi);
+                ps.setInt(8,bb);
+                ps.setInt(9,so);
+                ps.setInt(10,hp);
+                ps.setInt(11,fb);
+                ps.setInt(12,sb);
+                ps.setInt(13,tb);
+                ps.setInt(14,hr);
+                ps.setInt(15,total);
+                ps.setInt(16, gameID);
+                
+             ps.executeQuery();   
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query away teams batter one");
+            System.out.println(e);
+        }
     }
     
       // returns an ArrayList of all the seasons(years) in the Games table GAGE 
