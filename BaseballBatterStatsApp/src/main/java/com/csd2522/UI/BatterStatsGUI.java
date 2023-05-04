@@ -936,15 +936,15 @@ public ArrayList<Batter> registerStats() {
         String firstB = firstBField(i).getText();
         String secondB = secondBField(i).getText();
         String thirdB = thirdBField(i).getText();
-//        String fourthB = fourthBField(i).getText();
-//        String ab = abField(i).getText();
-//        String runs = runsField(i).getText();
-//        String hits = hitsField(i).getText();
-//        String bb = bbField(i).getText();
-//        String so = soField(i).getText();
-//        String hp = hpField(i).getText();
-//        String rbi = rbiField(i).getText();
-//        String tb = tbField(i).getText();
+        String fourthB = fourthBField(i).getText();
+        String ab = abField(i).getText();
+        String runs = runsField(i).getText();
+        String hits = hitsField(i).getText();
+        String bb = bbField(i).getText();
+        String so = soField(i).getText();
+        String hp = hpField(i).getText();
+        String rbi = rbiField(i).getText();
+        String tb = tbField(i).getText();
 
         //need playerID
         int playerIDint = Integer.parseInt(playerID);
@@ -958,18 +958,18 @@ public ArrayList<Batter> registerStats() {
         // Create a new Batter object and populate it with the player's stats
         Batter player = new Batter(playerIDint, firstName, lastName, teamID);
         player.setPosition(position);
-        player.setFB(Integer.parseInt(firstB));
-        player.setSB(Integer.parseInt(secondB));
-        player.setTB(Integer.parseInt(thirdB));
-//        player.setHR(Integer.parseInt(fourthB));
-//        player.setAB(Integer.parseInt(ab));
-//        player.setRuns(Integer.parseInt(runs));
-//        player.setHits(Integer.parseInt(hits));
-//        player.setBb(Integer.parseInt(bb));
-//        player.setSo(Integer.parseInt(so));
-//        player.setHp(Integer.parseInt(hp));
-//        player.setRbi(Integer.parseInt(rbi));
-//        player.setTB(Integer.parseInt(tb));
+        player.setFB(v.returnInteger(firstB));
+        player.setSB(v.returnInteger(secondB));
+        player.setTB(v.returnInteger(thirdB));
+        player.setHR(v.returnInteger(fourthB));
+        player.setAB(v.returnInteger(ab));
+        player.setRuns(v.returnInteger(runs));
+        player.setHits(v.returnInteger(hits));
+        player.setBb(v.returnInteger(bb));
+        player.setSo(v.returnInteger(so));
+        player.setHp(v.returnInteger(hp));
+        player.setRbi(v.returnInteger(rbi));
+        player.setTB(v.returnInteger(tb));
 
         playerStats.add(player);
     }
