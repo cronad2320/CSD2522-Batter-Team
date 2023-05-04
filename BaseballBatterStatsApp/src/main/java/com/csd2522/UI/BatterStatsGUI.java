@@ -255,7 +255,7 @@ public class BatterStatsGUI extends Application {
         });
         //Check for player stats button
         Button checkForStatsButton = new Button("Update Stats");
-        checkForStatsButton.setOnAction(event -> pullStats());
+        //checkForStatsButton.setOnAction(event -> pullStats());
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
@@ -936,15 +936,15 @@ public ArrayList<Batter> registerStats() {
         String firstB = firstBField(i).getText();
         String secondB = secondBField(i).getText();
         String thirdB = thirdBField(i).getText();
-        String fourthB = fourthBField(i).getText();
-        String ab = abField(i).getText();
-        String runs = runsField(i).getText();
-        String hits = hitsField(i).getText();
-        String bb = bbField(i).getText();
-        String so = soField(i).getText();
-        String hp = hpField(i).getText();
-        String rbi = rbiField(i).getText();
-        String tb = tbField(i).getText();
+//        String fourthB = fourthBField(i).getText();
+//        String ab = abField(i).getText();
+//        String runs = runsField(i).getText();
+//        String hits = hitsField(i).getText();
+//        String bb = bbField(i).getText();
+//        String so = soField(i).getText();
+//        String hp = hpField(i).getText();
+//        String rbi = rbiField(i).getText();
+//        String tb = tbField(i).getText();
 
         //need playerID
         int playerIDint = Integer.parseInt(playerID);
@@ -961,15 +961,15 @@ public ArrayList<Batter> registerStats() {
         player.setFB(Integer.parseInt(firstB));
         player.setSB(Integer.parseInt(secondB));
         player.setTB(Integer.parseInt(thirdB));
-        player.setHR(Integer.parseInt(fourthB));
-        player.setAB(Integer.parseInt(ab));
-        player.setRuns(Integer.parseInt(runs));
-        player.setHits(Integer.parseInt(hits));
-        player.setBb(Integer.parseInt(bb));
-        player.setSo(Integer.parseInt(so));
-        player.setHp(Integer.parseInt(hp));
-        player.setRbi(Integer.parseInt(rbi));
-        player.setTB(Integer.parseInt(tb));
+//        player.setHR(Integer.parseInt(fourthB));
+//        player.setAB(Integer.parseInt(ab));
+//        player.setRuns(Integer.parseInt(runs));
+//        player.setHits(Integer.parseInt(hits));
+//        player.setBb(Integer.parseInt(bb));
+//        player.setSo(Integer.parseInt(so));
+//        player.setHp(Integer.parseInt(hp));
+//        player.setRbi(Integer.parseInt(rbi));
+//        player.setTB(Integer.parseInt(tb));
 
         playerStats.add(player);
     }
