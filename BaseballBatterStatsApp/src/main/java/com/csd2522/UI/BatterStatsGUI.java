@@ -22,6 +22,8 @@ import java.util.TreeMap;
 
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -212,7 +214,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(registerStatsButton);
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
-        //registerStatsButton.setOnAction(registerStats());
+        registerStatsButton.setOnAction(e -> registerStats());
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
@@ -248,8 +250,6 @@ public class BatterStatsGUI extends Application {
 
         });
         //Check for player stats button
-        Button checkForStatsButton = new Button("Update Stats");
-        //checkForStatsButton.setOnAction(event -> pullStats());
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
@@ -259,7 +259,6 @@ public class BatterStatsGUI extends Application {
         buttonBox1.getChildren().add(gameSelect);
         buttonBox1.getChildren().add(teamSelect);
         buttonBox1.getChildren().add(selectTeamButton);
-        buttonBox1.getChildren().add(checkForStatsButton);
         grid.add(buttonBox1, 0, 0, 9, 1);
 
         //Positions 
@@ -917,7 +916,7 @@ public class BatterStatsGUI extends Application {
         return treeMap;
     }
 
-public ArrayList<Batter> registerStats() {
+public ArrayList<Batter> registerStats(){
     Validation v = new Validation();
     ArrayList<Batter> playerStats = new ArrayList<Batter>();
     
