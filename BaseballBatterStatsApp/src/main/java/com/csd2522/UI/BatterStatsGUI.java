@@ -1101,13 +1101,36 @@ private TextField thirdBField(int i) {
     }
         return null;
 }
-// add similar methods for the other text fields
 
+private TextField fourthBField(int i) {
+    switch(i) {
+        case 1:
+            return fourthBField1;
+        case 2:
+            return fourthBField2;
+        case 3:
+            return fourthBField3;
+        case 4:
+            return fourthBField4;
+        case 5:
+            return fourthBField5;
+        case 6:
+            return fourthBField6;
+        case 7:
+            return fourthBField7;
+        case 8:
+            return fourthBField8;
+        case 9:
+            return fourthBField9;
+          
+    }
+        return null;
+}
 
     public void handle(ActionEvent event) {
-
+Validation v = new Validation();
         if ( //player1
-                firstBField1.getText().isEmpty() || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
+                v.isInteger(firstBField1.getText()) || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
                 || bbField1.getText().isEmpty() || soField1.getText().isEmpty() || hpField1.getText().isEmpty()
                 || //player2
                 firstBField2.getText().isEmpty() || secondBField2.getText().isEmpty() || thirdBField2.getText().isEmpty() || fourthBField2.getText().isEmpty() || abField2.getText().isEmpty() || runsField2.getText().isEmpty() || hitsField2.getText().isEmpty()
