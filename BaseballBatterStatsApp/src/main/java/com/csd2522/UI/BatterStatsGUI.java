@@ -14,29 +14,23 @@ import static com.csd2522.UI.PlayerAddGUI.fillTeamCombo;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
-import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
@@ -876,7 +870,6 @@ public class BatterStatsGUI extends Application {
     }
 
     public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) {
-        Validation v = new Validation();
 
         String teamName = teamSelect.getSelectionModel().getSelectedItem();
         /*        String sql = "Select *"
@@ -918,7 +911,6 @@ public class BatterStatsGUI extends Application {
     }
 
     private TreeMap<String, Integer> fillPHash(ComboBox<String> teamSelect) {
-        BatterDB db = new BatterDB();
         String team = teamSelect.getSelectionModel().getSelectedItem();
 
         TreeMap<String, Integer> treeMap = db.getPlayers(team);
@@ -929,6 +921,14 @@ public ArrayList<Batter> registerStats() {
     Validation v = new Validation();
     ArrayList<Batter> playerStats = new ArrayList<Batter>();
     
+    //Pull current game saelected
+    String gameID = gameSelect.getSelectionModel().getSelectedItem();
+    int gameIdInt = v.returnInteger(gameID);
+    
+    //Pull current team
+    String teamID = teamSelect.getSelectionModel().getSelectedItem();
+    
+    //loops through all players
     for (int i = 1; i <= 9; i++) {
         //get player data
         String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
@@ -951,7 +951,6 @@ public ArrayList<Batter> registerStats() {
         
         //get player name and team ID
         Batter playerN = db.returnPlayer(playerIDint);
-        String teamID = teamSelect.getSelectionModel().getSelectedItem();
         String firstName = playerN.getFirstName();
         String lastName = playerN.getLastName();
         
@@ -971,7 +970,9 @@ public ArrayList<Batter> registerStats() {
         player.setRbi(v.returnInteger(rbi));
         player.setTB(v.returnInteger(tb));
 
-        playerStats.add(player);
+        db.insertBatterStats(player, gameIdInt);
+
+
     }
 
     // Return the ArrayList of Batter objects containing the player stats
@@ -1127,7 +1128,203 @@ private TextField fourthBField(int i) {
         return null;
 }
 
-    public void handle(ActionEvent event) {
+private TextField abField(int i) {
+    switch(i) {
+        case 1:
+            return abField1;
+        case 2:
+            return abField2;
+        case 3:
+            return abField3;
+        case 4:
+            return abField4;
+        case 5:
+            return abField5;
+        case 6:
+            return abField6;
+        case 7:
+            return abField7;
+        case 8:
+            return abField8;
+        case 9:
+            return abField9;
+          
+    }
+        return null;
+}
+
+private TextField runsField(int i) {
+    switch(i) {
+        case 1:
+            return runsField1;
+        case 2:
+            return runsField2;
+        case 3:
+            return runsField3;
+        case 4:
+            return runsField4;
+        case 5:
+            return runsField5;
+        case 6:
+            return runsField6;
+        case 7:
+            return runsField7;
+        case 8:
+            return runsField8;
+        case 9:
+            return runsField9;
+          
+    }
+        return null;
+}
+
+private TextField hitsField(int i) {
+    switch(i) {
+        case 1:
+            return hitsField1;
+        case 2:
+            return hitsField2;
+        case 3:
+            return hitsField3;
+        case 4:
+            return hitsField4;
+        case 5:
+            return hitsField5;
+        case 6:
+            return hitsField6;
+        case 7:
+            return hitsField7;
+        case 8:
+            return hitsField8;
+        case 9:
+            return hitsField9;
+          
+    }
+        return null;
+}
+
+private TextField bbField(int i) {
+    switch(i) {
+        case 1:
+            return bbField1;
+        case 2:
+            return bbField2;
+        case 3:
+            return bbField3;
+        case 4:
+            return bbField4;
+        case 5:
+            return bbField5;
+        case 6:
+            return bbField6;
+        case 7:
+            return bbField7;
+        case 8:
+            return bbField8;
+        case 9:
+            return bbField9;
+          
+    }
+        return null;
+}
+
+private TextField soField(int i) {
+    switch(i) {
+        case 1:
+            return soField1;
+        case 2:
+            return soField2;
+        case 3:
+            return soField3;
+        case 4:
+            return soField4;
+        case 5:
+            return soField5;
+        case 6:
+            return soField6;
+        case 7:
+            return soField7;
+        case 8:
+            return soField8;
+        case 9:
+            return soField9;
+          
+    }
+        return null;
+}
+
+private TextField hpField(int i) {
+    switch(i) {
+        case 1:
+            return hpField1;
+        case 2:
+            return hpField2;
+        case 3:
+            return hpField3;
+        case 4:
+            return hpField4;
+        case 5:
+            return hpField5;
+        case 6:
+            return hpField6;
+        case 7:
+            return hpField7;
+        case 8:
+            return hpField8;
+        case 9:
+            return hpField9;
+    }
+        return null;
+}
+
+private TextField rbiField(int i) {
+    switch(i) {
+        case 1:
+            return rbiField1;
+        case 2:
+            return rbiField2;
+        case 3:
+            return rbiField3;
+        case 4:
+            return rbiField4;
+        case 5:
+            return rbiField5;
+        case 6:
+            return rbiField6;
+        case 7:
+            return rbiField7;
+        case 8:
+            return rbiField8;
+        case 9:
+            return rbiField9;
+    }
+        return null;
+}
+
+private TextField tbField(int i) {
+    switch(i) {
+        case 1:
+            return tbField1;
+        case 2:
+            return tbField2;
+        case 3:
+            return tbField3;
+        case 4:
+            return tbField4;
+        case 5:
+            return tbField5;
+        case 6:
+            return tbField6;
+        case 7:
+            return tbField7;
+        case 8:
+            return tbField8;
+        case 9:
+            return tbField9;
+    }
+        return null;
+}
+    /*public void handle(ActionEvent event) {
 Validation v = new Validation();
         if ( //player1
                 v.isInteger(firstBField1.getText()) || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
@@ -1161,5 +1358,5 @@ Validation v = new Validation();
         }
         //      else {
 
-    }
+    }*/
 }
