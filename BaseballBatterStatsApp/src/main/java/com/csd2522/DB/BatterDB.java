@@ -301,7 +301,7 @@ public class BatterDB {
     }    
     // this method will start as test, print game information to console, then when complete, I will 
     // have it print to a file, just like the project requires DC 4/25/2023
-    public void printGameToFile(int gameId) {
+    public StringBuilder printGameToFile(int gameId) {
        
         // build nest array list, index 0 holds team one/away teams batters, index 1 holds team two/home teams batters DC 4/30/2023
         ArrayList<ArrayList<Batter>> playersByTeam = batterStatsOneGame(gameId);
@@ -406,6 +406,8 @@ public class BatterDB {
         
         //create file
         FileOutPut.writeFile(fileSB.toString(),fileName);
+        
+        return fileSB;
     }
     
 
