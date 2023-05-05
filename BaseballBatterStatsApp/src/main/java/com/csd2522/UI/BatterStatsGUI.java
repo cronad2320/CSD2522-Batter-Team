@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javafx.application.Application;
@@ -965,8 +967,10 @@ public ArrayList<Batter> registerStats(){
     //Pull current team
     String teamID = teamSelect.getSelectionModel().getSelectedItem();
     
+    //testing an additional loop below to test playerIDs 
+    
     //loops through all players
-    for (int i = 1; i <= 9; i++) {
+   /* for (int i = 1; i <= 9; i++) {
         //get player data
         String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
         String position = positionSelect(i).getSelectionModel().getSelectedItem();
@@ -1014,6 +1018,76 @@ public ArrayList<Batter> registerStats(){
 
     // Return the ArrayList of Batter objects containing the player stats
     return playerStats;
+}*/
+   // Create a HashSet to keep track of selected player IDs
+Set<String> selectedPlayerIDs = new HashSet<>();
+
+//loops through all players
+for (int i = 1; i <= 9; i++) {
+    //get player data
+    String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
+
+    // Check if the player has already been selected
+    if (selectedPlayerIDs.contains(playerID)) {
+        // Handle the case where the player has already been selected
+        // (e.g. display an error message, etc.)
+        System.out.println("Player " + playerID + " has already been selected.");
+    } else {
+        // Add the selected player ID to the HashSet
+        selectedPlayerIDs.add(playerID);
+
+        // The rest of your existing code goes here...
+        String position = positionSelect(i).getSelectionModel().getSelectedItem();
+        String firstB = firstBField(i).getText();
+        String secondB = secondBField(i).getText();
+        String thirdB = thirdBField(i).getText();
+        String fourthB = fourthBField(i).getText();
+        String ab = abField(i).getText();
+        String runs = runsField(i).getText();
+        String hits = hitsField(i).getText();
+        String bb = bbField(i).getText();
+        String so = soField(i).getText();
+        String hp = hpField(i).getText();
+        String rbi = rbiField(i).getText();
+        String tb = tbField(i).getText();
+
+        //need playerID
+        int playerIDint = Integer.parseInt(playerID);
+        
+        //get player name and team ID
+        Batter playerN = db.returnPlayer(playerIDint);
+        String firstName = playerN.getFirstName();
+        String lastName = playerN.getLastName();
+        
+        // Create a new Batter object and populate it with the player's stats
+        Batter player = new Batter(playerIDint, firstName, lastName, teamID);
+        player.setPosition(position);
+        player.setFB(v.returnInteger(firstB));
+        player.setSB(v.returnInteger(secondB));
+        player.setTB(v.returnInteger(thirdB));
+        player.setHR(v.returnInteger(fourthB));
+        player.setAB(v.returnInteger(ab));
+        player.setRuns(v.returnInteger(runs));
+        player.setHits(v.returnInteger(hits));
+        player.setBb(v.returnInteger(bb));
+        player.setSo(v.returnInteger(so));
+        player.setHp(v.returnInteger(hp));
+        player.setRbi(v.returnInteger(rbi));
+        player.setTB(v.returnInteger(tb));
+
+        db.insertBatterStats(player, gameIdInt);
+    }
+}
+
+// Check if the number of selected players is less than 9
+if (selectedPlayerIDs.size() < 9) {
+    // Handle the case where not all players have been selected
+    // (e.g. display an error message, etc.)
+    System.out.println("Not all players have been selected.");
+}
+
+// Return the ArrayList of Batter objects containing the player stats
+return playerStats;
 }
 
 // helper methods to get the JavaFX controls for the i-th player
