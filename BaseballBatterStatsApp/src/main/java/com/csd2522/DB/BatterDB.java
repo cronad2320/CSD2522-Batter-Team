@@ -83,6 +83,41 @@ public class BatterDB {
             System.out.println(e);
         }    
     }
+    // method to return an arraylist of positions based on positions entered in Positions table in database. This way our positions stay standardized between pages DC 5/4/2023
+    public ArrayList<String> getPositions() {
+        ArrayList<String> positions = new ArrayList<>();
+        try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM Positions"))            
+        {
+            
+            // create ResultSet object
+            ResultSet rs = ps.executeQuery();
+            
+            
+            //as long as there is a result in result set we will continue going
+            while (rs.next())
+            {
+                //use column names and result set to get data for code, description price from first record
+                
+                String pos = rs.getString(1);
+                
+                
+                System.out.println(pos);
+                positions.add(pos);
+            }
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query");
+            System.out.println(e);
+        }    
+        
+        return positions;
+    }
+    
     // return Batter object with player id, player last name, and player first name, and player team based on player id passed to this function DC 4/26/2023
     public Batter returnPlayer(int playerID)
     {

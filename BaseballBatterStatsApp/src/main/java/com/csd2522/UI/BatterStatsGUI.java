@@ -36,7 +36,9 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
-
+    
+    
+    
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
     private Label selectTeamLabel = new Label("Select Team to Show Players");
@@ -71,7 +73,7 @@ public class BatterStatsGUI extends Application {
     private final HashMap<String, Integer> games = db.getTeams();
     private static TreeMap<String, Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
-
+    private ArrayList<String> positions = db.getPositions();
     //Player 1
     TextField firstBField1 = new TextField();
     TextField secondBField1 = new TextField();
@@ -261,20 +263,20 @@ public class BatterStatsGUI extends Application {
         buttonBox1.getChildren().add(selectTeamButton);
         grid.add(buttonBox1, 0, 0, 9, 1);
 
-        //Positions 
-        String[] positions = {"Pitch Hitter", "Catcher", "First base", "Second base",
-            "Third base", "Short stop", "Left field", "Center field", "Right field"
-        };
+//        //Positions 
+//        String[] positions = {"Pitch Hitter", "Catcher", "First base", "Second base",
+//            "Third base", "Short stop", "Left field", "Center field", "Right field"
+        //};
         //Add positions to team select boxex
-        positionSelect1.getItems().addAll(Arrays.asList(positions));
-        positionSelect2.getItems().addAll(Arrays.asList(positions));
-        positionSelect3.getItems().addAll(Arrays.asList(positions));
-        positionSelect4.getItems().addAll(Arrays.asList(positions));
-        positionSelect5.getItems().addAll(Arrays.asList(positions));
-        positionSelect6.getItems().addAll(Arrays.asList(positions));
-        positionSelect7.getItems().addAll(Arrays.asList(positions));
-        positionSelect8.getItems().addAll(Arrays.asList(positions));
-        positionSelect9.getItems().addAll(Arrays.asList(positions));
+        positionSelect1.getItems().addAll(positions);
+        positionSelect2.getItems().addAll(positions);
+        positionSelect3.getItems().addAll(positions);
+        positionSelect4.getItems().addAll(positions);
+        positionSelect5.getItems().addAll(positions);
+        positionSelect6.getItems().addAll(positions);
+        positionSelect7.getItems().addAll(positions);
+        positionSelect8.getItems().addAll(positions);
+        positionSelect9.getItems().addAll(positions);
 
         //create labels 
         //Label selectGameLabel = new Label ("Select Game");
