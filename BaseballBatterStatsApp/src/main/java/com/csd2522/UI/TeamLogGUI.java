@@ -131,7 +131,7 @@ public class TeamLogGUI extends Application {
         // Checks if all of the boxes are filled.
         if (!(awayComboBox.getSelectionModel().getSelectedItem().isEmpty()) && !(homeComboBox.getSelectionModel().getSelectedItem().isEmpty())
             && v.isPresent(awayScoreTextField.getText()) && v.isPresent(homeScoreTextField.getText())
-            && v.isPresent(gameDateBox.getValue())) {
+                ) {
             
             // Creates a BatterDB object
             BatterDB batterdb = new BatterDB();
