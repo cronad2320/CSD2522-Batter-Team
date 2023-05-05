@@ -84,6 +84,8 @@ public class BatterStatsGUI extends Application {
     private static TreeMap<String, Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
     private ArrayList<String> positions = db.getPositions();
+    Set<String> playerIds = new HashSet<>();
+    Set<String> positionsSet = new HashSet<>();
 
     //create text fields 
     //Player 1
@@ -229,6 +231,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
         registerStatsButton.setOnAction(e -> registerStats());
+        clearStatsButton.setOnAction(e -> resetButtonAction());
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
@@ -915,15 +918,11 @@ public class BatterStatsGUI extends Application {
         String teamID = teamSelect.getSelectionModel().getSelectedItem();
 
 
-        // Create a HashSet to keep track of selected player IDs and positions
-        Set<String> playerIds = new HashSet<>();
-        Set<String> positions = new HashSet<>();
-
-//loops through all players
+        //loops through all players
         for (int i = 1; i <= 9; i++) {
             //get player data
             String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
-            String position = positionSelect(i).getSelectionModel().getSelectedItem();
+            String positionSet = positionSelect(i).getSelectionModel().getSelectedItem();
 
             // check if playerID has already been selected
             if (playerIds.contains(playerID)) {
@@ -934,11 +933,11 @@ public class BatterStatsGUI extends Application {
             }
             
             // check if position has already been selected
-            if (positions.contains(position)) {
-                System.out.println("Position " + position + " has been chosen more than once.");
+            if (positions.contains(positionSet)) {
+                System.out.println("Position " + positionSet + " has been chosen more than once.");
             } else {
                 // add position to set
-                positions.add(position);
+                positions.add(positionSet);
             }
             //go through the rest of the entries
             String firstB = firstBField(i).getText();
@@ -964,7 +963,7 @@ public class BatterStatsGUI extends Application {
 
             // Create a new Batter object and populate it with the player's stats
             Batter player = new Batter(playerIDint, firstName, lastName, teamID);
-            player.setPosition(position);
+            player.setPosition(positionSet);
             player.setFB(v.returnInteger(firstB));
             player.setSB(v.returnInteger(secondB));
             player.setTB(v.returnInteger(thirdB));
@@ -1332,6 +1331,63 @@ private TextField tbField(int i) {
 
 }
 public void resetForm() {
-    //reset selections b
+// Clear all input fields
+for (int i = 1; i <= 9; i++) {
+    firstBField(i).setText("");
+    secondBField(i).setText("");
+    thirdBField(i).setText("");
+    fourthBField(i).setText("");
+    abField(i).setText("");
+    runsField(i).setText("");
+    hitsField(i).setText("");
+    bbField(i).setText("");
+    soField(i).setText("");
+    hpField(i).setText("");
+    rbiField(i).setText("");
+    tbField(i).setText("");
+}
+
+// Reset drop-down menus
+for (int i = 1; i <= 9; i++) {
+    playerSelect(i).getItems().clear();
+    positionSelect(i).getItems().clear();
+}
+        teamSelect.getItems().clear();
+
+        // Clear selected player and position sets
+        playerIds.clear();
+        positions.clear();
+}
+
+public void setPrompt() {
+            teamSelect.setPromptText("Select Team");
+        // Player Select ComboBoxs labels 
+        playerSelect1.setPromptText("Select Player");
+        playerSelect2.setPromptText("Select Player");
+        playerSelect3.setPromptText("Select Player");
+        playerSelect4.setPromptText("Select Player");
+        playerSelect5.setPromptText("Select Player");
+        playerSelect6.setPromptText("Select Player");
+        playerSelect7.setPromptText("Select Player");
+        playerSelect8.setPromptText("Select Player");
+        playerSelect9.setPromptText("Select Player");
+
+        //Set prompt text for position select
+        positionSelect1.setPromptText("Position");
+        positionSelect2.setPromptText("Position");
+        positionSelect3.setPromptText("Position");
+        positionSelect4.setPromptText("Position");
+        positionSelect5.setPromptText("Position");
+        positionSelect6.setPromptText("Position");
+        positionSelect7.setPromptText("Position");
+        positionSelect8.setPromptText("Position");
+        positionSelect9.setPromptText("Position");
+        
+}
+
+public void resetButtonAction() {
+    //reset form
+    resetForm();
+    setPrompt();
 }
 }
