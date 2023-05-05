@@ -231,7 +231,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
         registerStatsButton.setOnAction(e -> registerStats());
-        clearStatsButton.setOnAction(e -> resetButtonAction());
+        clearStatsButton.setOnAction(e -> resetForm());
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
@@ -1350,9 +1350,15 @@ for (int i = 1; i <= 9; i++) {
 // Reset drop-down menus
 for (int i = 1; i <= 9; i++) {
     playerSelect(i).getItems().clear();
+    playerSelect(i).getItems().add("Select Player");
+    playerSelect(i).getSelectionModel().selectFirst();
     positionSelect(i).getItems().clear();
+    positionSelect(i).getItems().add("Select Position");
+    positionSelect(i).getSelectionModel().selectFirst();
 }
         teamSelect.getItems().clear();
+        teamSelect.getItems().add("Select Team");
+        teamSelect.getSelectionModel().selectFirst();
 
         // Clear selected player and position sets
         playerIds.clear();
