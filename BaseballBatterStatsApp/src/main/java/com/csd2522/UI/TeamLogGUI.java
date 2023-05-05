@@ -133,35 +133,40 @@ public class TeamLogGUI extends Application {
             && v.isPresent(awayScoreTextField.getText()) && v.isPresent(homeScoreTextField.getText())
                 ) {
             
-            // Creates a BatterDB object
-            BatterDB batterdb = new BatterDB();
+            // Checks if the user entered unique integers for scores
+            if (v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText()) && !(awayScoreTextField.getText().equals(homeScoreTextField.getText()))) {
+                // Creates a BatterDB object
+                BatterDB batterdb = new BatterDB();
 
-            // Gets the user's team choices
-            String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
-            String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
+                // Gets the user's team choices
+                String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
+                String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
 
-            // get score from text fields
-            int awayScore = Integer.parseInt(awayScoreTextField.getText());
-            int homeScore = Integer.parseInt(homeScoreTextField.getText());
+                // get score from text fields
+                int awayScore = Integer.parseInt(awayScoreTextField.getText());
+                int homeScore = Integer.parseInt(homeScoreTextField.getText());
 
-            // Get the date
-            LocalDate date = gameDateBox.getValue();
-            String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
+                // Get the date
+                LocalDate date = gameDateBox.getValue();
+                String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
 
-            // Send the information to the insertGame method of BatterDB to add the information to the Games table
-            //batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
+                // Send the information to the insertGame method of BatterDB to add the information to the Games table
+                //batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
 
-            // Clear the fields
-            homeComboBox.getSelectionModel().clearSelection();
-            awayComboBox.getSelectionModel().clearSelection();
-            homeScoreTextField.clear();
-            awayScoreTextField.clear();
-            homeScoreTextField.clear();
-            awayScoreTextField.clear();
-            gameDateBox.getEditor().clear();
+                // Clear the fields
+                homeComboBox.getSelectionModel().clearSelection();
+                awayComboBox.getSelectionModel().clearSelection();
+                homeScoreTextField.clear();
+                awayScoreTextField.clear();
+                homeScoreTextField.clear();
+                awayScoreTextField.clear();
+                gameDateBox.getEditor().clear();
 
-            // Close connection when done
-            batterdb.closeConnection();
+                // Close connection when done
+                batterdb.closeConnection();
+            } else {
+                v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
+            }
         } else {
             
             v.displayAlertError("Incomplete", "Please fill in all options.");
