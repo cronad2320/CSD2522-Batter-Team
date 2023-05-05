@@ -14,29 +14,25 @@ import static com.csd2522.UI.PlayerAddGUI.fillTeamCombo;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
-import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
@@ -218,7 +214,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(registerStatsButton);
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
-        //registerStatsButton.setOnAction(registerStats());
+        registerStatsButton.setOnAction(e -> registerStats());
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
@@ -254,8 +250,6 @@ public class BatterStatsGUI extends Application {
 
         });
         //Check for player stats button
-        Button checkForStatsButton = new Button("Update Stats");
-        //checkForStatsButton.setOnAction(event -> pullStats());
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
@@ -265,7 +259,6 @@ public class BatterStatsGUI extends Application {
         buttonBox1.getChildren().add(gameSelect);
         buttonBox1.getChildren().add(teamSelect);
         buttonBox1.getChildren().add(selectTeamButton);
-        buttonBox1.getChildren().add(checkForStatsButton);
         grid.add(buttonBox1, 0, 0, 9, 1);
 
         //Positions 
@@ -876,7 +869,6 @@ public class BatterStatsGUI extends Application {
     }
 
     public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) {
-        Validation v = new Validation();
 
         String teamName = teamSelect.getSelectionModel().getSelectedItem();
         /*        String sql = "Select *"
@@ -918,17 +910,24 @@ public class BatterStatsGUI extends Application {
     }
 
     private TreeMap<String, Integer> fillPHash(ComboBox<String> teamSelect) {
-        BatterDB db = new BatterDB();
         String team = teamSelect.getSelectionModel().getSelectedItem();
 
         TreeMap<String, Integer> treeMap = db.getPlayers(team);
         return treeMap;
     }
 
-public ArrayList<Batter> registerStats() {
+public ArrayList<Batter> registerStats(){
     Validation v = new Validation();
     ArrayList<Batter> playerStats = new ArrayList<Batter>();
     
+    //Pull current game saelected
+    String gameID = gameSelect.getSelectionModel().getSelectedItem();
+    int gameIdInt = v.returnInteger(gameID);
+    
+    //Pull current team
+    String teamID = teamSelect.getSelectionModel().getSelectedItem();
+    
+    //loops through all players
     for (int i = 1; i <= 9; i++) {
         //get player data
         String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
@@ -936,42 +935,43 @@ public ArrayList<Batter> registerStats() {
         String firstB = firstBField(i).getText();
         String secondB = secondBField(i).getText();
         String thirdB = thirdBField(i).getText();
-//        String fourthB = fourthBField(i).getText();
-//        String ab = abField(i).getText();
-//        String runs = runsField(i).getText();
-//        String hits = hitsField(i).getText();
-//        String bb = bbField(i).getText();
-//        String so = soField(i).getText();
-//        String hp = hpField(i).getText();
-//        String rbi = rbiField(i).getText();
-//        String tb = tbField(i).getText();
+        String fourthB = fourthBField(i).getText();
+        String ab = abField(i).getText();
+        String runs = runsField(i).getText();
+        String hits = hitsField(i).getText();
+        String bb = bbField(i).getText();
+        String so = soField(i).getText();
+        String hp = hpField(i).getText();
+        String rbi = rbiField(i).getText();
+        String tb = tbField(i).getText();
 
         //need playerID
         int playerIDint = Integer.parseInt(playerID);
         
         //get player name and team ID
         Batter playerN = db.returnPlayer(playerIDint);
-        String teamID = teamSelect.getSelectionModel().getSelectedItem();
         String firstName = playerN.getFirstName();
         String lastName = playerN.getLastName();
         
         // Create a new Batter object and populate it with the player's stats
         Batter player = new Batter(playerIDint, firstName, lastName, teamID);
         player.setPosition(position);
-        player.setFB(Integer.parseInt(firstB));
-        player.setSB(Integer.parseInt(secondB));
-        player.setTB(Integer.parseInt(thirdB));
-//        player.setHR(Integer.parseInt(fourthB));
-//        player.setAB(Integer.parseInt(ab));
-//        player.setRuns(Integer.parseInt(runs));
-//        player.setHits(Integer.parseInt(hits));
-//        player.setBb(Integer.parseInt(bb));
-//        player.setSo(Integer.parseInt(so));
-//        player.setHp(Integer.parseInt(hp));
-//        player.setRbi(Integer.parseInt(rbi));
-//        player.setTB(Integer.parseInt(tb));
+        player.setFB(v.returnInteger(firstB));
+        player.setSB(v.returnInteger(secondB));
+        player.setTB(v.returnInteger(thirdB));
+        player.setHR(v.returnInteger(fourthB));
+        player.setAB(v.returnInteger(ab));
+        player.setRuns(v.returnInteger(runs));
+        player.setHits(v.returnInteger(hits));
+        player.setBb(v.returnInteger(bb));
+        player.setSo(v.returnInteger(so));
+        player.setHp(v.returnInteger(hp));
+        player.setRbi(v.returnInteger(rbi));
+        player.setTB(v.returnInteger(tb));
 
-        playerStats.add(player);
+        db.insertBatterStats(player, gameIdInt);
+
+
     }
 
     // Return the ArrayList of Batter objects containing the player stats
@@ -1101,13 +1101,232 @@ private TextField thirdBField(int i) {
     }
         return null;
 }
-// add similar methods for the other text fields
 
+private TextField fourthBField(int i) {
+    switch(i) {
+        case 1:
+            return fourthBField1;
+        case 2:
+            return fourthBField2;
+        case 3:
+            return fourthBField3;
+        case 4:
+            return fourthBField4;
+        case 5:
+            return fourthBField5;
+        case 6:
+            return fourthBField6;
+        case 7:
+            return fourthBField7;
+        case 8:
+            return fourthBField8;
+        case 9:
+            return fourthBField9;
+          
+    }
+        return null;
+}
 
-    public void handle(ActionEvent event) {
+private TextField abField(int i) {
+    switch(i) {
+        case 1:
+            return abField1;
+        case 2:
+            return abField2;
+        case 3:
+            return abField3;
+        case 4:
+            return abField4;
+        case 5:
+            return abField5;
+        case 6:
+            return abField6;
+        case 7:
+            return abField7;
+        case 8:
+            return abField8;
+        case 9:
+            return abField9;
+          
+    }
+        return null;
+}
 
+private TextField runsField(int i) {
+    switch(i) {
+        case 1:
+            return runsField1;
+        case 2:
+            return runsField2;
+        case 3:
+            return runsField3;
+        case 4:
+            return runsField4;
+        case 5:
+            return runsField5;
+        case 6:
+            return runsField6;
+        case 7:
+            return runsField7;
+        case 8:
+            return runsField8;
+        case 9:
+            return runsField9;
+          
+    }
+        return null;
+}
+
+private TextField hitsField(int i) {
+    switch(i) {
+        case 1:
+            return hitsField1;
+        case 2:
+            return hitsField2;
+        case 3:
+            return hitsField3;
+        case 4:
+            return hitsField4;
+        case 5:
+            return hitsField5;
+        case 6:
+            return hitsField6;
+        case 7:
+            return hitsField7;
+        case 8:
+            return hitsField8;
+        case 9:
+            return hitsField9;
+          
+    }
+        return null;
+}
+
+private TextField bbField(int i) {
+    switch(i) {
+        case 1:
+            return bbField1;
+        case 2:
+            return bbField2;
+        case 3:
+            return bbField3;
+        case 4:
+            return bbField4;
+        case 5:
+            return bbField5;
+        case 6:
+            return bbField6;
+        case 7:
+            return bbField7;
+        case 8:
+            return bbField8;
+        case 9:
+            return bbField9;
+          
+    }
+        return null;
+}
+
+private TextField soField(int i) {
+    switch(i) {
+        case 1:
+            return soField1;
+        case 2:
+            return soField2;
+        case 3:
+            return soField3;
+        case 4:
+            return soField4;
+        case 5:
+            return soField5;
+        case 6:
+            return soField6;
+        case 7:
+            return soField7;
+        case 8:
+            return soField8;
+        case 9:
+            return soField9;
+          
+    }
+        return null;
+}
+
+private TextField hpField(int i) {
+    switch(i) {
+        case 1:
+            return hpField1;
+        case 2:
+            return hpField2;
+        case 3:
+            return hpField3;
+        case 4:
+            return hpField4;
+        case 5:
+            return hpField5;
+        case 6:
+            return hpField6;
+        case 7:
+            return hpField7;
+        case 8:
+            return hpField8;
+        case 9:
+            return hpField9;
+    }
+        return null;
+}
+
+private TextField rbiField(int i) {
+    switch(i) {
+        case 1:
+            return rbiField1;
+        case 2:
+            return rbiField2;
+        case 3:
+            return rbiField3;
+        case 4:
+            return rbiField4;
+        case 5:
+            return rbiField5;
+        case 6:
+            return rbiField6;
+        case 7:
+            return rbiField7;
+        case 8:
+            return rbiField8;
+        case 9:
+            return rbiField9;
+    }
+        return null;
+}
+
+private TextField tbField(int i) {
+    switch(i) {
+        case 1:
+            return tbField1;
+        case 2:
+            return tbField2;
+        case 3:
+            return tbField3;
+        case 4:
+            return tbField4;
+        case 5:
+            return tbField5;
+        case 6:
+            return tbField6;
+        case 7:
+            return tbField7;
+        case 8:
+            return tbField8;
+        case 9:
+            return tbField9;
+    }
+        return null;
+}
+    /*public void handle(ActionEvent event) {
+Validation v = new Validation();
         if ( //player1
-                firstBField1.getText().isEmpty() || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
+                v.isInteger(firstBField1.getText()) || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
                 || bbField1.getText().isEmpty() || soField1.getText().isEmpty() || hpField1.getText().isEmpty()
                 || //player2
                 firstBField2.getText().isEmpty() || secondBField2.getText().isEmpty() || thirdBField2.getText().isEmpty() || fourthBField2.getText().isEmpty() || abField2.getText().isEmpty() || runsField2.getText().isEmpty() || hitsField2.getText().isEmpty()
@@ -1138,5 +1357,5 @@ private TextField thirdBField(int i) {
         }
         //      else {
 
-    }
+    }*/
 }

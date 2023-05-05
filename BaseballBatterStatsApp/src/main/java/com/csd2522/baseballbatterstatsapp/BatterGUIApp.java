@@ -44,6 +44,7 @@ public class BatterGUIApp extends Application {
         Stage aggregateStage = new Stage();
         Stage statStage = new Stage();
         Stage teamLog = new Stage();
+        Stage generateGame = new Stage();
 
         //GridPane to attach items to
         GridPane mainPane = new GridPane();
@@ -68,7 +69,7 @@ public class BatterGUIApp extends Application {
         batterStatsButton.setOnAction(event -> new BatterStatsGUI().start(statStage));
         
         Button gameReportButton = new Button("Generate Game Report");
-        gameReportButton.setOnAction(event -> printGameReport(gameSelect,games));
+        gameReportButton.setOnAction(event -> printGameReport(gameSelect,games, generateGame));
         
         Button aggregateButton = new Button("Generate Aggregate Player Data");
         aggregateButton.setOnAction(event -> new AggregateStatGui().start(aggregateStage));
@@ -109,7 +110,7 @@ public class BatterGUIApp extends Application {
     }
     
     //this method takes in value from combobox and then calls printGameToFile with id came from hashmap as match for value in combobox 4/25/2023
-    public static void printGameReport(ComboBox<String> gameBox, HashMap<String, Integer> game)
+    public static void printGameReport(ComboBox<String> gameBox, HashMap<String, Integer> game, Stage stage)
     {
         Validation v= new Validation();
         // create instance for DB connection DC 4/25/2023
@@ -126,11 +127,14 @@ public class BatterGUIApp extends Application {
             int gameID = game.get(key);
 
             //pass gameID to printToFile DC 4/25/2023
-            db.printGameToFile(gameID);   
+            StringBuilder message = db.printGameToFile(gameID);   
+            new GameDisplayGUI().start(stage, message );
         } else
         {
             v.displayAlertError("Game ID not found, please  make sure a selction was made", "No game found");
         }
+        
+        
     }
         
 }

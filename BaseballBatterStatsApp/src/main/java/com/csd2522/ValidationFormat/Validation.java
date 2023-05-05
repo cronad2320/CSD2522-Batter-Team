@@ -168,6 +168,18 @@ public class Validation {
            return integerStatus;
     
     }
+    //returns an valid integer
+    public static int returnInteger(String s) {
+        int s1 = 0;
+        try
+           {
+             s1 =  Integer.parseInt(s);
+           } catch(NumberFormatException e)
+           {
+                System.out.println("Attempted push value was not a valid integer.\n");
+           }
+        return s1;
+    }
     
     // this will displayAlertError if needed DC 4/27/2023
     public void displayAlertError(String err, String header)
