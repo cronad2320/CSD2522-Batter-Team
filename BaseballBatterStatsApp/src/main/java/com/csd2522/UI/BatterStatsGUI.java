@@ -5,25 +5,23 @@
 package com.csd2522.UI;
 
 /**
- *
- * @author nickr
+ *Author: Nick Ryan 
+ * Date: 5/6/2023
+ * Purpose: Page displays batter stats gui and allows user to choose a game, team, and the players to enter stats for a game to submit to the database.
  */
 import com.csd2522.Batter.Batter;
 import com.csd2522.DB.BatterDB;
-import static com.csd2522.UI.PlayerAddGUI.fillTeamCombo;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
-
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,12 +31,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
 
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
+
     private Label selectTeamLabel = new Label("Select Team to Show Players");
     ComboBox<String> gameSelect = new ComboBox<>();
 
@@ -63,15 +64,21 @@ public class BatterStatsGUI extends Application {
     private ComboBox<String> positionSelect7 = new ComboBox<>();
     private ComboBox<String> positionSelect8 = new ComboBox<>();
     private ComboBox<String> positionSelect9 = new ComboBox<>();
-    //String p1 = playerSelect1.getSelectionModel().getSelectedItem();
 
     // get DB instance
     public BatterDB db = new BatterDB();
 
+    Validation v = new Validation();
     private final HashMap<String, Integer> games = db.getTeams();
+    int gameIdInt = v.returnInteger(gameSelect.getSelectionModel().getSelectedItem());
+    private final ArrayList<String> gameTeams = db.returnTeams(gameIdInt);
     private static TreeMap<String, Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
+    private ArrayList<String> positions = db.getPositions();
+    Set<String> playerIds = new HashSet<>();
+    Set<String> positionsSet = new HashSet<>();
 
+    //create text fields 
     //Player 1
     TextField firstBField1 = new TextField();
     TextField secondBField1 = new TextField();
@@ -215,11 +222,54 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
         registerStatsButton.setOnAction(e -> registerStats());
+        clearStatsButton.setOnAction(e -> resetForm());
+        
+        //game select combo box
+        ComboBox<String> gameSelect = new ComboBox<>();
+        gameSelect.setPromptText("Select Game");
+
+        //button to show the teams for the selected game
+        Button confirmGameButton = new Button("Confirm Game");
+        Label instructionLabel = new Label ("Confirm game and team" + "\nto generate player list");
+        //set instrionLabel bold 
+        Font font = Font.font("Arial" ,FontWeight.BOLD, 12);
+        instructionLabel.setFont(font);
+        confirmGameButton.setOnAction(event -> {
+            String key = gameSelect.getSelectionModel().getSelectedItem();
+            // check key to avoid errors
+            if (games.containsKey(key)) {
+                // get current game id
+                int currentGameId = games.get(key);
+ 
+                // Fill the teamSelect ComboBox with the team names for the selected game
+                teamSelect.getItems().addAll(db.returnTeams(currentGameId));
+
+            } else {
+                v.displayAlertError("No game id was found. Please make sure to select a game first.", "No game found");
+            }
+
+        });
+
+        //Select game button to show current teams
+        Button confirmTeamButton = new Button("Confirm Team");
+        confirmTeamButton.setOnAction(event -> {
+            players = fillPHash(teamSelect);
+            getPlayers(playerSelect1, players);
+
+        });
+        //fill gameSelect combo box 
+        fillGameCombo(gameSelect, games);
+        //create a button box and add buttons for the top of the form
+        HBox buttonBox1 = new HBox(10);
+        buttonBox1.getChildren().add(instructionLabel);
+        buttonBox1.getChildren().add(gameSelect);
+        buttonBox1.getChildren().add(confirmGameButton);
+        buttonBox1.getChildren().add(teamSelect);
+        buttonBox1.getChildren().add(confirmTeamButton);
+        grid.add(buttonBox1, 0, 0, 15, 1);
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
-        fillTeamCombo(teamSelect, teams);
-
         // Player Select ComboBoxs labels 
         playerSelect1.setPromptText("Select Player");
         playerSelect2.setPromptText("Select Player");
@@ -231,7 +281,7 @@ public class BatterStatsGUI extends Application {
         playerSelect8.setPromptText("Select Player");
         playerSelect9.setPromptText("Select Player");
 
-        //Set prompt text for player select
+        //Set prompt text for position select
         positionSelect1.setPromptText("Position");
         positionSelect2.setPromptText("Position");
         positionSelect3.setPromptText("Position");
@@ -241,43 +291,24 @@ public class BatterStatsGUI extends Application {
         positionSelect7.setPromptText("Position");
         positionSelect8.setPromptText("Position");
         positionSelect9.setPromptText("Position");
-        //Select Team button 
-        // Player Select combo boxes are filled withing getPlayers 
-        Button selectTeamButton = new Button("Select Team");
-        selectTeamButton.setOnAction(event -> {
-            players = fillPHash(teamSelect);
-            getPlayers(playerSelect1, players);
 
-        });
-        //Check for player stats button
-        //game select combo box
-        ComboBox<String> gameSelect = new ComboBox<>();
-        gameSelect.setPromptText("Select Game");
-        //fill gameSelect combo box 
-        fillGameCombo(gameSelect, games);
-        HBox buttonBox1 = new HBox(10);
-        buttonBox1.getChildren().add(gameSelect);
-        buttonBox1.getChildren().add(teamSelect);
-        buttonBox1.getChildren().add(selectTeamButton);
-        grid.add(buttonBox1, 0, 0, 9, 1);
 
-        //Positions 
-        String[] positions = {"Pitch Hitter", "Catcher", "First base", "Second base",
-            "Third base", "Short stop", "Left field", "Center field", "Right field"
-        };
+
+
+
         //Add positions to team select boxex
-        positionSelect1.getItems().addAll(Arrays.asList(positions));
-        positionSelect2.getItems().addAll(Arrays.asList(positions));
-        positionSelect3.getItems().addAll(Arrays.asList(positions));
-        positionSelect4.getItems().addAll(Arrays.asList(positions));
-        positionSelect5.getItems().addAll(Arrays.asList(positions));
-        positionSelect6.getItems().addAll(Arrays.asList(positions));
-        positionSelect7.getItems().addAll(Arrays.asList(positions));
-        positionSelect8.getItems().addAll(Arrays.asList(positions));
-        positionSelect9.getItems().addAll(Arrays.asList(positions));
+        positionSelect1.getItems().addAll(positions);
+        positionSelect2.getItems().addAll(positions);
+        positionSelect3.getItems().addAll(positions);
+        positionSelect4.getItems().addAll(positions);
+        positionSelect5.getItems().addAll(positions);
+        positionSelect6.getItems().addAll(positions);
+        positionSelect7.getItems().addAll(positions);
+        positionSelect8.getItems().addAll(positions);
+        positionSelect9.getItems().addAll(positions);
 
         //create labels 
-        //Label selectGameLabel = new Label ("Select Game");
+
         //Player Labels
         Label player1 = new Label("Player 1");
         Label player2 = new Label("Player 2");
@@ -288,10 +319,7 @@ public class BatterStatsGUI extends Application {
         Label player7 = new Label("Player 7");
         Label player8 = new Label("Player 8");
         Label player9 = new Label("Player 9");
-
         //Player 1
-        // Label playerSelectLabel1 = new Label ("Select Player:");
-        // Label positionSelectLabel1 = new Label ("Player Position:");
         Label firstBLabel1 = new Label("1B:");
         Label secondBLabel1 = new Label("2B:");
         Label thirdBLabel1 = new Label("3B:");
@@ -305,8 +333,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel1 = new Label("RBI:");
         Label tbLabel1 = new Label("TB");
         //Player2
-        //  Label playerSelectLabel2 = new Label ("Select Player:");
-        // Label positionSelectLabel2 = new Label ("Player Position:");
         Label firstBLabel2 = new Label("1B:");
         Label secondBLabel2 = new Label("2B:");
         Label thirdBLabel2 = new Label("3B:");
@@ -320,8 +346,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel2 = new Label("RBI:");
         Label tbLabel2 = new Label("TB");
         //Player 3
-        //Label playerSelectLabel3 = new Label ("Select Player:");
-        //Label positionSelectLabel3 = new Label ("Player Position:");
         Label firstBLabel3 = new Label("1B:");
         Label secondBLabel3 = new Label("2B:");
         Label thirdBLabel3 = new Label("3B:");
@@ -335,8 +359,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel3 = new Label("RBI:");
         Label tbLabel3 = new Label("TB");
         //Player 4
-        //Label playerSelectLabel4 = new Label ("Select Player:");
-        //Label positionSelectLabel4 = new Label ("Player Position:");
         Label firstBLabel4 = new Label("1B:");
         Label secondBLabel4 = new Label("2B:");
         Label thirdBLabel4 = new Label("3B:");
@@ -350,8 +372,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel4 = new Label("RBI:");
         Label tbLabel4 = new Label("TB");
         //Player 5
-        //Label playerSelectLabel5 = new Label ("Select Player:");
-        //Label positionSelectLabel5 = new Label ("Player Position:");
         Label firstBLabel5 = new Label("1B:");
         Label secondBLabel5 = new Label("2B:");
         Label thirdBLabel5 = new Label("3B:");
@@ -365,8 +385,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel5 = new Label("RBI:");
         Label tbLabel5 = new Label("TB");
         //Player 6
-        //Label playerSelectLabel6 = new Label ("Select Player:");
-        //Label positionSelectLabel6 = new Label ("Player Position:");
         Label firstBLabel6 = new Label("1B:");
         Label secondBLabel6 = new Label("2B:");
         Label thirdBLabel6 = new Label("3B:");
@@ -380,8 +398,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel6 = new Label("RBI:");
         Label tbLabel6 = new Label("TB");
         //Player 7
-        //Label playerSelectLabel7 = new Label ("Select Player:");
-        //Label positionSelectLabel7 = new Label ("Player Position:");
         Label firstBLabel7 = new Label("1B:");
         Label secondBLabel7 = new Label("2B:");
         Label thirdBLabel7 = new Label("3B:");
@@ -395,8 +411,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel7 = new Label("RBI:");
         Label tbLabel7 = new Label("TB");
         //Player 8
-        //Label playerSelectLabel8 = new Label ("Select Player:");
-        //Label positionSelectLabel8 = new Label ("Player Position:");
         Label firstBLabel8 = new Label("1B:");
         Label secondBLabel8 = new Label("2B:");
         Label thirdBLabel8 = new Label("3B:");
@@ -410,8 +424,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel8 = new Label("RBI:");
         Label tbLabel8 = new Label("TB");
         //Player 9
-        //Label playerSelectLabel9 = new Label ("Select Player:");
-        //Label positionSelectLabel9 = new Label ("Player Position:");
         Label firstBLabel9 = new Label("1B:");
         Label secondBLabel9 = new Label("2B:");
         Label thirdBLabel9 = new Label("3B:");
@@ -425,7 +437,6 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel9 = new Label("RBI:");
         Label tbLabel9 = new Label("TB");
 
-        //Create text fields
         //Set widths
         gameSelect.setPrefWidth(110);
         teamSelect.setPrefWidth(110);
@@ -569,10 +580,8 @@ public class BatterStatsGUI extends Application {
         //Add to grid
         //P1
         //First row
-        //grid.add(playerSelectLabel1, 0, 3);
         grid.add(player1, 0, 2);
         grid.add(playerSelect1, 1, 2);
-        //grid.add(positionSelectLabel1, 2, 3);
         grid.add(positionSelect1, 1, 3);
         grid.add(firstBLabel1, 2, 2);
         grid.add(firstBField1, 3, 2);
@@ -600,13 +609,10 @@ public class BatterStatsGUI extends Application {
         grid.add(rbiField1, 11, 3);
         grid.add(tbLabel1, 12, 3);
         grid.add(tbField1, 13, 3);
-
         //P2
         //First row
-        //grid.add(playerSelectLabel2, 0, 5);
         grid.add(player2, 0, 4);
         grid.add(playerSelect2, 1, 4);
-        //grid.add(positionSelectLabel2, 2, 5);
         grid.add(positionSelect2, 1, 5);
         grid.add(firstBLabel2, 2, 4);
         grid.add(firstBField2, 3, 4);
@@ -636,10 +642,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField2, 13, 5);
         //P3
         //First row
-        //grid.add(playerSelectLabel3, 0, 7);
         grid.add(player3, 0, 6);
         grid.add(playerSelect3, 1, 6);
-        //grid.add(positionSelectLabel3, 2, 7);
         grid.add(positionSelect3, 1, 7);
         grid.add(firstBLabel3, 2, 6);
         grid.add(firstBField3, 3, 6);
@@ -669,10 +673,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField3, 13, 7);
         //P4
         //First row
-        //grid.add(playerSelectLabel4, 0, 9);
         grid.add(player4, 0, 8);
         grid.add(playerSelect4, 1, 8);
-        //grid.add(positionSelectLabel4, 2, 9);
         grid.add(positionSelect4, 1, 9);
         grid.add(firstBLabel4, 2, 8);
         grid.add(firstBField4, 3, 8);
@@ -702,10 +704,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField4, 13, 9);
         //P5
         //First row
-        //grid.add(playerSelectLabel5, 0, 11);
         grid.add(player5, 0, 10);
         grid.add(playerSelect5, 1, 10);
-        //grid.add(positionSelectLabel5, 2, 11);
         grid.add(positionSelect5, 1, 11);
         grid.add(firstBLabel5, 2, 10);
         grid.add(firstBField5, 3, 10);
@@ -735,10 +735,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField5, 13, 11);
         //P6
         //First row
-        //grid.add(playerSelectLabel6, 0, 13);
         grid.add(player6, 0, 12);
         grid.add(playerSelect6, 1, 12);
-        //grid.add(positionSelectLabel6, 2, 13);
         grid.add(positionSelect6, 1, 13);
         grid.add(firstBLabel6, 2, 12);
         grid.add(firstBField6, 3, 12);
@@ -768,10 +766,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField6, 13, 13);
         //P7
         //First row
-        //grid.add(playerSelectLabel7, 0, 15);
         grid.add(player7, 0, 14);
         grid.add(playerSelect7, 1, 14);
-        //grid.add(positionSelectLabel7, 2, 15);
         grid.add(positionSelect7, 1, 15);
         grid.add(firstBLabel7, 2, 14);
         grid.add(firstBField7, 3, 14);
@@ -801,10 +797,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField7, 13, 15);
         //P8
         //First row
-        //grid.add(playerSelectLabel8, 0, 17);
         grid.add(player8, 0, 16);
         grid.add(playerSelect8, 1, 16);
-        //grid.add(positionSelectLabel8, 2, 17);
         grid.add(positionSelect8, 1, 17);
         grid.add(firstBLabel8, 2, 16);
         grid.add(firstBField8, 3, 16);
@@ -834,10 +828,8 @@ public class BatterStatsGUI extends Application {
         grid.add(tbField8, 13, 17);
         //P9
         //First row
-        //grid.add(playerSelectLabel9, 0, 19);
         grid.add(player9, 0, 18);
         grid.add(playerSelect9, 1, 18);
-        //grid.add(positionSelectLabel9, 2, 19);
         grid.add(positionSelect9, 1, 19);
         grid.add(firstBLabel9, 2, 18);
         grid.add(firstBField9, 3, 18);
@@ -871,11 +863,6 @@ public class BatterStatsGUI extends Application {
     public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) {
 
         String teamName = teamSelect.getSelectionModel().getSelectedItem();
-        /*        String sql = "Select *"
-                + "from Batter_Stats"
-                + "Where Batter_stat_player_id = ?";
-       
-        PreparedStatement ps = connection.prepareStatement(sql);*/
 
         // create ResultSet object
         if (players.size() != 0) {
@@ -902,11 +889,12 @@ public class BatterStatsGUI extends Application {
         return playerSelect;
     }
 
-    public static ComboBox<String> fillTeamSelect(ComboBox<String> teamSelectm, ArrayList<String> teams) {
-        for (String team : teams) {
-            teamSelect.getItems().add(team);
+    public static ComboBox<String> fillTeamSelect(ComboBox<String> iterateBox, ArrayList<String> teams) {
+        for (String element : teams) {
+            iterateBox.getItems().add(element);
         }
-        return teamSelect;
+
+        return iterateBox;
     }
 
     private TreeMap<String, Integer> fillPHash(ComboBox<String> teamSelect) {
@@ -916,69 +904,85 @@ public class BatterStatsGUI extends Application {
         return treeMap;
     }
 
-public ArrayList<Batter> registerStats(){
-    Validation v = new Validation();
-    ArrayList<Batter> playerStats = new ArrayList<Batter>();
-    
-    //Pull current game saelected
-    String gameID = gameSelect.getSelectionModel().getSelectedItem();
-    int gameIdInt = v.returnInteger(gameID);
-    
-    //Pull current team
-    String teamID = teamSelect.getSelectionModel().getSelectedItem();
-    
-    //loops through all players
-    for (int i = 1; i <= 9; i++) {
-        //get player data
-        String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
-        String position = positionSelect(i).getSelectionModel().getSelectedItem();
-        String firstB = firstBField(i).getText();
-        String secondB = secondBField(i).getText();
-        String thirdB = thirdBField(i).getText();
-        String fourthB = fourthBField(i).getText();
-        String ab = abField(i).getText();
-        String runs = runsField(i).getText();
-        String hits = hitsField(i).getText();
-        String bb = bbField(i).getText();
-        String so = soField(i).getText();
-        String hp = hpField(i).getText();
-        String rbi = rbiField(i).getText();
-        String tb = tbField(i).getText();
+    public ArrayList<Batter> registerStats() {
+        Validation v = new Validation();
+        ArrayList<Batter> playerStats = new ArrayList<Batter>();
 
-        //need playerID
-        int playerIDint = Integer.parseInt(playerID);
-        
-        //get player name and team ID
-        Batter playerN = db.returnPlayer(playerIDint);
-        String firstName = playerN.getFirstName();
-        String lastName = playerN.getLastName();
-        
-        // Create a new Batter object and populate it with the player's stats
-        Batter player = new Batter(playerIDint, firstName, lastName, teamID);
-        player.setPosition(position);
-        player.setFB(v.returnInteger(firstB));
-        player.setSB(v.returnInteger(secondB));
-        player.setTB(v.returnInteger(thirdB));
-        player.setHR(v.returnInteger(fourthB));
-        player.setAB(v.returnInteger(ab));
-        player.setRuns(v.returnInteger(runs));
-        player.setHits(v.returnInteger(hits));
-        player.setBb(v.returnInteger(bb));
-        player.setSo(v.returnInteger(so));
-        player.setHp(v.returnInteger(hp));
-        player.setRbi(v.returnInteger(rbi));
-        player.setTB(v.returnInteger(tb));
+        //Pull current game saelected
+        String gameID = gameSelect.getSelectionModel().getSelectedItem();
+        int gameIdInt = v.returnInteger(gameID);
 
-        db.insertBatterStats(player, gameIdInt);
+        //Pull current team
+        String teamID = teamSelect.getSelectionModel().getSelectedItem();
 
 
-    }
+        //loops through all players
+        for (int i = 1; i <= 9; i++) {
+            //get player data
+            String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
+            String positionSet = positionSelect(i).getSelectionModel().getSelectedItem();
 
-    // Return the ArrayList of Batter objects containing the player stats
-    return playerStats;
+            // check if playerID has already been selected
+            if (playerIds.contains(playerID)) {
+                System.out.println("Player " + playerID + " has been selected more than once.");
+            } else {
+                // add playerID to set
+                playerIds.add(playerID);
+            }
+            
+            // check if position has already been selected
+            if (positions.contains(positionSet)) {
+                System.out.println("Position " + positionSet + " has been chosen more than once.");
+            } else {
+                // add position to set
+                positions.add(positionSet);
+            }
+            //go through the rest of the entries
+            String firstB = firstBField(i).getText();
+            String secondB = secondBField(i).getText();
+            String thirdB = thirdBField(i).getText();
+            String fourthB = fourthBField(i).getText();
+            String ab = abField(i).getText();
+            String runs = runsField(i).getText();
+            String hits = hitsField(i).getText();
+            String bb = bbField(i).getText();
+            String so = soField(i).getText();
+            String hp = hpField(i).getText();
+            String rbi = rbiField(i).getText();
+            String tb = tbField(i).getText();
+
+            //need playerID
+            int playerIDint = Integer.parseInt(playerID);
+
+            //get player name and team ID
+            Batter playerN = db.returnPlayer(playerIDint);
+            String firstName = playerN.getFirstName();
+            String lastName = playerN.getLastName();
+
+            // Create a new Batter object and populate it with the player's stats
+            Batter player = new Batter(playerIDint, firstName, lastName, teamID);
+            player.setPosition(positionSet);
+            player.setFB(v.returnInteger(firstB));
+            player.setSB(v.returnInteger(secondB));
+            player.setTB(v.returnInteger(thirdB));
+            player.setHR(v.returnInteger(fourthB));
+            player.setAB(v.returnInteger(ab));
+            player.setRuns(v.returnInteger(runs));
+            player.setHits(v.returnInteger(hits));
+            player.setBb(v.returnInteger(bb));
+            player.setSo(v.returnInteger(so));
+            player.setHp(v.returnInteger(hp));
+            player.setRbi(v.returnInteger(rbi));
+            player.setTB(v.returnInteger(tb));
+
+            db.insertBatterStats(player, gameIdInt);
+        }
+
+// Return the ArrayList of Batter objects containing the player stats
+    return playerStats ;
 }
 
-// helper methods to get the JavaFX controls for the i-th player
+// helper methods to get the controls for the i-th player
 private ComboBox<String> playerSelect(int i) {
     switch(i) {
         case 1:
@@ -1322,40 +1326,42 @@ private TextField tbField(int i) {
             return tbField9;
     }
         return null;
-}
-    /*public void handle(ActionEvent event) {
-Validation v = new Validation();
-        if ( //player1
-                v.isInteger(firstBField1.getText()) || secondBField1.getText().isEmpty() || thirdBField1.getText().isEmpty() || fourthBField1.getText().isEmpty() || abField1.getText().isEmpty() || runsField1.getText().isEmpty() || hitsField1.getText().isEmpty()
-                || bbField1.getText().isEmpty() || soField1.getText().isEmpty() || hpField1.getText().isEmpty()
-                || //player2
-                firstBField2.getText().isEmpty() || secondBField2.getText().isEmpty() || thirdBField2.getText().isEmpty() || fourthBField2.getText().isEmpty() || abField2.getText().isEmpty() || runsField2.getText().isEmpty() || hitsField2.getText().isEmpty()
-                || bbField2.getText().isEmpty() || soField2.getText().isEmpty() || hpField2.getText().isEmpty()
-                || //player3
-                firstBField3.getText().isEmpty() || secondBField3.getText().isEmpty() || thirdBField3.getText().isEmpty() || fourthBField3.getText().isEmpty() || abField3.getText().isEmpty() || runsField3.getText().isEmpty() || hitsField3.getText().isEmpty()
-                || bbField3.getText().isEmpty() || soField3.getText().isEmpty() || hpField3.getText().isEmpty()
-                || //Player4
-                firstBField4.getText().isEmpty() || secondBField4.getText().isEmpty() || thirdBField4.getText().isEmpty() || fourthBField4.getText().isEmpty() || abField4.getText().isEmpty() || runsField4.getText().isEmpty() || hitsField4.getText().isEmpty()
-                || bbField4.getText().isEmpty() || soField4.getText().isEmpty() || hpField4.getText().isEmpty()
-                || //Player5
-                firstBField5.getText().isEmpty() || secondBField5.getText().isEmpty() || thirdBField5.getText().isEmpty() || fourthBField5.getText().isEmpty() || abField5.getText().isEmpty() || runsField5.getText().isEmpty() || hitsField5.getText().isEmpty()
-                || bbField5.getText().isEmpty() || soField5.getText().isEmpty() || hpField5.getText().isEmpty()
-                || //Player6
-                firstBField6.getText().isEmpty() || secondBField6.getText().isEmpty() || thirdBField6.getText().isEmpty() || fourthBField6.getText().isEmpty() || abField6.getText().isEmpty() || runsField7.getText().isEmpty() || hitsField7.getText().isEmpty()
-                || bbField6.getText().isEmpty() || soField6.getText().isEmpty() || hpField7.getText().isEmpty()
-                || //Player7
-                firstBField7.getText().isEmpty() || secondBField7.getText().isEmpty() || thirdBField7.getText().isEmpty() || fourthBField7.getText().isEmpty() || abField7.getText().isEmpty() || runsField7.getText().isEmpty() || hitsField7.getText().isEmpty()
-                || bbField7.getText().isEmpty() || soField7.getText().isEmpty() || hpField7.getText().isEmpty()
-                || //Player8
-                firstBField9.getText().isEmpty() || secondBField9.getText().isEmpty() || thirdBField9.getText().isEmpty() || fourthBField9.getText().isEmpty() || abField9.getText().isEmpty() || runsField9.getText().isEmpty() || hitsField9.getText().isEmpty()
-                || bbField9.getText().isEmpty() || soField9.getText().isEmpty() || hpField9.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Missing entries");
-            alert.setContentText("Make sure to enter all players names.");
-            alert.showAndWait();
-            //eturn();
-        }
-        //      else {
 
-    }*/
+}
+//clears text fields and combo boxes.Also s
+public void resetForm() {
+// Clear all input fields
+for (int i = 1; i <= 9; i++) {
+    firstBField(i).setText("");
+    secondBField(i).setText("");
+    thirdBField(i).setText("");
+    fourthBField(i).setText("");
+    abField(i).setText("");
+    runsField(i).setText("");
+    hitsField(i).setText("");
+    bbField(i).setText("");
+    soField(i).setText("");
+    hpField(i).setText("");
+    rbiField(i).setText("");
+    tbField(i).setText("");
+}
+
+// Reset drop-down menus
+for (int i = 1; i <= 9; i++) {
+    playerSelect(i).getItems().clear();
+    playerSelect(i).getItems().add("Select Player");
+    playerSelect(i).getSelectionModel().selectFirst();
+    positionSelect(i).getItems().clear();
+    positionSelect(i).getItems().add("Select Position");
+    positionSelect(i).getSelectionModel().selectFirst();
+}
+teamSelect.getItems().clear();
+teamSelect.getItems().add("Select Team");
+teamSelect.getSelectionModel().selectFirst();
+
+// Clear selected player and position sets
+playerIds.clear();
+positions.clear();
+}
+
 }

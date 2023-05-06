@@ -19,7 +19,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.DatePicker;
 import java.time.LocalDate;
 import com.csd2522.DB.BatterDB;
+import com.csd2522.ValidationFormat.Validation;
 import java.sql.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class TeamLogGUI extends Application {
@@ -49,7 +51,7 @@ public class TeamLogGUI extends Application {
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.setHgap(10);
         grid.setVgap(10);
-        Scene scene = new Scene(grid, 1000,300);
+        Scene scene = new Scene(grid, 625, 200);
         
         // Sets the prompt text of the combo boxes
         homeComboBox.setPromptText("Select Home Team");
@@ -71,31 +73,23 @@ public class TeamLogGUI extends Application {
         }
         
         // Adds the team labels and team combo boxes to the first row
-        HBox topRow = new HBox();
-        topRow.getChildren().add(homeTeamLabel);
-        topRow.getChildren().add(homeComboBox);
-        topRow.getChildren().add(awayTeamLabel);
-        topRow.getChildren().add(awayComboBox);
+        grid.add(homeTeamLabel, 0, 0);
+        grid.add(homeComboBox, 1, 0);
+        grid.add(awayTeamLabel, 2, 0);
+        grid.add(awayComboBox, 3, 0);
        
         // Adds the score labels and score text fields to the middle row
-        HBox middleRow = new HBox();
-        middleRow.getChildren().add(homeScoreLabel);
-        middleRow.getChildren().add(homeScoreTextField);
-        middleRow.getChildren().add(awayScoreLabel);
-        middleRow.getChildren().add(awayScoreTextField);
+        grid.add(homeScoreLabel, 0, 1);
+        grid.add(homeScoreTextField, 1, 1);
+        grid.add(awayScoreLabel, 2, 1);
+        grid.add(awayScoreTextField, 3, 1);
         
         // Adds the game date label, game date date box, and create game button to the bottom row.
         // Also creates an event listener for the create game button. Calls createGameButtonClicked() when clicked.
-        HBox bottomRow = new HBox();
-        bottomRow.getChildren().add(gameDateLabel);
-        bottomRow.getChildren().add(gameDateBox);
+        grid.add(gameDateLabel, 0, 2);
+        grid.add(gameDateBox, 1, 2);
         createGameButton.setOnAction(event -> createGameButtonClicked());
-        bottomRow.getChildren().add(createGameButton);
-       
-        // Adds the rows to the window
-        grid.add(topRow,0,0);
-        grid.add(middleRow,0,1);
-        grid.add(bottomRow,0,2);
+        grid.add(createGameButton, 2, 2);
         
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -103,26 +97,76 @@ public class TeamLogGUI extends Application {
     
     private void createGameButtonClicked() {
         
-        // Creates a BatterDB object
-        BatterDB batterdb = new BatterDB();
+        // Creates a new validation object
+        Validation v = new Validation();
         
-        // Gets the user's team choices
-        String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
-        String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
         
-        // get score from text fields
-        int awayScore = Integer.parseInt(awayScoreTextField.getText());
-        int homeScore = Integer.parseInt(homeScoreTextField.getText());
-        
-        // Get the date
-        LocalDate date = gameDateBox.getValue();
-        String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
-        
-        // Send the information to the insertGame method of BatterDB to add the information to the Games table
-        batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
-         
-        // Close connection when done
-        batterdb.closeConnection();
+       
+        // Checks if all of the boxes are filled.
+        if (!(awayComboBox.getSelectionModel().isEmpty()) && !(homeComboBox.getSelectionModel().isEmpty()) 
+            && v.isPresent(awayScoreTextField.getText()) && v.isPresent(homeScoreTextField.getText())
+            && gameDateBox.getValue() != null) {
+            
+            // Checks if the user entered unique integers for scores
+            if (v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText()) && !(awayScoreTextField.getText().equals(homeScoreTextField.getText()))) {
+                
+                // Creates a BatterDB object
+                BatterDB batterdb = new BatterDB();
+
+                // Gets the user's team choices
+                String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
+                String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
+
+                // get score from text fields
+                int awayScore = Integer.parseInt(awayScoreTextField.getText());
+                int homeScore = Integer.parseInt(homeScoreTextField.getText());
+
+                // Get the date
+                LocalDate date = gameDateBox.getValue();
+                String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
+
+                // Send the information to the insertGame method of BatterDB to add the information to the Games table
+                batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
+
+                // Clear the fields
+                homeComboBox.getSelectionModel().clearSelection();
+                homeComboBox.setPromptText("Select Home Team");
+                awayComboBox.getSelectionModel().clearSelection();
+                awayComboBox.setPromptText("Select Away Team");
+
+                homeScoreTextField.clear();
+                awayScoreTextField.clear();
+                homeScoreTextField.clear();
+                awayScoreTextField.clear();
+                gameDateBox.getEditor().clear();
+                gameDateBox.setValue(null);
+
+                // Close connection when done
+                batterdb.closeConnection();
+
+            } else {
+                if((awayScoreTextField.getText().equals(homeScoreTextField.getText())))
+                {
+                    // Pops up an error message if the user enters the same score for both teams
+                    v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
+                } else if (!(v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText())))
+                {
+                    // Let us know the integers are invalid
+                    v.displayAlertError("One of the scores is not a valid integer", "Use valid and unique integers");
+                }
+            }
+        } else {
+            if(gameDateBox.getValue() == null)
+            {
+                v.displayAlertError("Please select a valid date with the date picker", "Must use date picker calendar option to select date");
+            }
+            else
+            {
+                // Pops an error message up if the user fill in all boxes and check boxes
+                v.displayAlertError("Please fill in all options with valid data", "Incomplete");
+            }
+            
+        }
     }//createGameButtonClicked
     
     
