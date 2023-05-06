@@ -6,13 +6,20 @@
 */
 package com.csd2522.UI;
 
+import com.csd2522.Batter.Batter;
 import com.csd2522.DB.BatterDB;
+import com.csd2522.ValidationFormat.Validation;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -62,12 +69,16 @@ public class AggregateStatGui extends Application{
         fillTeamID();
         fillSeasons();
         
+        /* STAGE */
+        Stage seasonStage = new Stage();
+        Stage gameStage = new Stage();
+        
         /* BUTTONS */
         Button gameButton = new Button("Generate Stats by date and Team");
-        gameButton.setOnAction(event -> gameButtonClicked());
+        gameButton.setOnAction(event -> gameButtonClicked(gameStage));
         
         Button seasonButton = new Button("Generate Stats by Season and Team");
-        seasonButton.setOnAction(event -> seasonButtonClicked());
+        seasonButton.setOnAction(event -> seasonButtonClicked(seasonStage));
         
         // Sets the label for the DatePickers
         startDatePicker.setPromptText("Start Date");
@@ -107,15 +118,89 @@ public class AggregateStatGui extends Application{
         statStage.show();
     }
     
-    
-    private void gameButtonClicked(){
-        // Does nothing for now
-        // Will need to generate stats from the player by team name and date
+    // Needs to get data from starDatePicker
+    // teamIDBox and endDatePicker
+    private void gameButtonClicked(Stage stage){
+        BatterDB bdb = new BatterDB();
+        
+        String selectedIndex = teamIDBox.getSelectionModel().getSelectedItem();
+        ArrayList<Batter> batterList;
+        
+        if(!(selectedIndex == "TeamID")){
+            if(!(startDatePicker.getValue() == null)){
+                if(!(endDatePicker.getValue() == null)){
+                    // String startDate, String endDate, String teamID
+                    LocalDate selectedStartDate = startDatePicker.getValue();
+                    LocalDate selectedEndDate = startDatePicker.getValue();
+                    
+                    String formattedStartDate = selectedStartDate.format(DateTimeFormatter.ISO_DATE);
+                    String formattedEndDate = selectedEndDate.format(DateTimeFormatter.ISO_DATE);
+                    
+                    batterList = bdb.statsByGame(formattedStartDate, formattedEndDate, selectedIndex);
+                    
+                    StringBuilder batterBuilder = bdb.printStatsToFile(batterList, selectedIndex, "Game");
+                    
+                    new GameDisplayGUI().start(stage, batterBuilder);
+                }
+                else{
+                    Alert endDateAlert = new Alert(AlertType.ERROR);
+                    endDateAlert.setTitle("Error!");
+                    endDateAlert.setHeaderText("End Date Alert!");
+                    endDateAlert.setContentText("Please selected a end date!");
+                    endDateAlert.showAndWait();
+                }
+            }
+            else{
+                Alert startDateAlert = new Alert(AlertType.ERROR);
+                startDateAlert.setTitle("Error!");
+                startDateAlert.setHeaderText("Start Date Alert!");
+                startDateAlert.setContentText("Please selected a start date!");
+                startDateAlert.showAndWait();
+            }
+        }
+        else{
+            Alert teamIDAlert = new Alert(AlertType.ERROR);
+            teamIDAlert.setTitle("Error!");
+            teamIDAlert.setHeaderText("TeamID Alert!");
+            teamIDAlert.setContentText("Please selected a team!");
+            teamIDAlert.showAndWait();
+        }
     }
     
-    private void seasonButtonClicked(){
-        // Does nothing for now
-        // Will need to generate stats from the player by team name and season
+    // Needs to get data from teamID
+    // seasonBox
+    private void seasonButtonClicked(Stage stage){
+        BatterDB bdb = new BatterDB();
+        
+        String teamIDSelectedValue = teamIDBox.getSelectionModel().getSelectedItem();
+        String seasonSelectedValue = seasonBox.getSelectionModel().getSelectedItem();
+        ArrayList<Batter> batterList;
+        
+        if(!(teamIDSelectedValue == "TeamID")){
+            if(!(seasonSelectedValue == "Year")){
+                
+                batterList = bdb.statsBySeason(teamIDSelectedValue, seasonSelectedValue);
+                
+                StringBuilder batterBuilder = bdb.printStatsToFile(batterList, teamIDSelectedValue, "Season");
+                
+                new GameDisplayGUI().start(stage, batterBuilder);
+            }
+            else{
+                Alert seasonAlert = new Alert(AlertType.ERROR);
+                seasonAlert.setTitle("Error!");
+                seasonAlert.setHeaderText("Season Alert!");
+                seasonAlert.setContentText("Please selected a year!");
+                seasonAlert.showAndWait();
+            }
+        }
+        else{
+            Alert teamIDAlert = new Alert(AlertType.ERROR);
+            teamIDAlert.setTitle("Error!");
+            teamIDAlert.setHeaderText("TeamID Alert!");
+            teamIDAlert.setContentText("Please selected a team!");
+            teamIDAlert.showAndWait();
+        }
+        
     }
     
     // Adds all of the teamIDs into the combo Box
@@ -135,5 +220,4 @@ public class AggregateStatGui extends Application{
             seasonBox.getItems().add(x);
         }
     }
-    
 }
