@@ -143,9 +143,15 @@ public class TeamLogGUI extends Application {
                 batterdb.closeConnection();
 
             } else {
-                
-                // Pops up an error message if the user enters the same score for both teams
-                v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
+                if((awayScoreTextField.getText().equals(homeScoreTextField.getText())))
+                {
+                    // Pops up an error message if the user enters the same score for both teams
+                    v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
+                } else if (!(v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText())))
+                {
+                    // Let us know the integers are invalid
+                    v.displayAlertError("One of the scores is not a valid integer", "Use valid and unique integers");
+                }
             }
         } else {
             
