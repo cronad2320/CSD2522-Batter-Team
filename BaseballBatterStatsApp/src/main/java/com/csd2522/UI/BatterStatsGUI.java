@@ -5,8 +5,9 @@
 package com.csd2522.UI;
 
 /**
- *
- * @author nickr
+ *Author: Nick Ryan 
+ * Date: 5/6/2023
+ * Purpose: Page displays batter stats gui and allows user to choose a game, team, and the players to enter stats for a game to submit to the database.
  */
 import com.csd2522.Batter.Batter;
 import com.csd2522.DB.BatterDB;
@@ -984,7 +985,7 @@ public class BatterStatsGUI extends Application {
     return playerStats ;
 }
 
-// helper methods to get the JavaFX controls for the i-th player
+// helper methods to get the controls for the i-th player
 private ComboBox<String> playerSelect(int i) {
     switch(i) {
         case 1:
@@ -1330,6 +1331,7 @@ private TextField tbField(int i) {
         return null;
 
 }
+//clears text fields and combo boxes.Also s
 public void resetForm() {
 // Clear all input fields
 for (int i = 1; i <= 9; i++) {
@@ -1356,44 +1358,13 @@ for (int i = 1; i <= 9; i++) {
     positionSelect(i).getItems().add("Select Position");
     positionSelect(i).getSelectionModel().selectFirst();
 }
-        teamSelect.getItems().clear();
-        teamSelect.getItems().add("Select Team");
-        teamSelect.getSelectionModel().selectFirst();
+teamSelect.getItems().clear();
+teamSelect.getItems().add("Select Team");
+teamSelect.getSelectionModel().selectFirst();
 
-        // Clear selected player and position sets
-        playerIds.clear();
-        positions.clear();
+// Clear selected player and position sets
+playerIds.clear();
+positions.clear();
 }
 
-public void setPrompt() {
-            teamSelect.setPromptText("Select Team");
-        // Player Select ComboBoxs labels 
-        playerSelect1.setPromptText("Select Player");
-        playerSelect2.setPromptText("Select Player");
-        playerSelect3.setPromptText("Select Player");
-        playerSelect4.setPromptText("Select Player");
-        playerSelect5.setPromptText("Select Player");
-        playerSelect6.setPromptText("Select Player");
-        playerSelect7.setPromptText("Select Player");
-        playerSelect8.setPromptText("Select Player");
-        playerSelect9.setPromptText("Select Player");
-
-        //Set prompt text for position select
-        positionSelect1.setPromptText("Position");
-        positionSelect2.setPromptText("Position");
-        positionSelect3.setPromptText("Position");
-        positionSelect4.setPromptText("Position");
-        positionSelect5.setPromptText("Position");
-        positionSelect6.setPromptText("Position");
-        positionSelect7.setPromptText("Position");
-        positionSelect8.setPromptText("Position");
-        positionSelect9.setPromptText("Position");
-        
-}
-
-public void resetButtonAction() {
-    //reset form
-    resetForm();
-    setPrompt();
-}
 }
