@@ -11,29 +11,17 @@ package com.csd2522.UI;
  */
 import com.csd2522.Batter.Batter;
 import com.csd2522.DB.BatterDB;
-import static com.csd2522.UI.PlayerAddGUI.fillTeamCombo;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
-import java.lang.StackWalker.Option;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -43,6 +31,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
@@ -233,6 +223,50 @@ public class BatterStatsGUI extends Application {
         grid.add(buttonBox2, 9, 20, 6, 2);
         registerStatsButton.setOnAction(e -> registerStats());
         clearStatsButton.setOnAction(e -> resetForm());
+        
+        //game select combo box
+        ComboBox<String> gameSelect = new ComboBox<>();
+        gameSelect.setPromptText("Select Game");
+
+        //button to show the teams for the selected game
+        Button confirmGameButton = new Button("Confirm Game");
+        Label instructionLabel = new Label ("Confirm game and team" + "\nto generate player list");
+        //set instrionLabel bold 
+        Font font = Font.font("Arial" ,FontWeight.BOLD, 12);
+        instructionLabel.setFont(font);
+        confirmGameButton.setOnAction(event -> {
+            String key = gameSelect.getSelectionModel().getSelectedItem();
+            // check key to avoid errors
+            if (games.containsKey(key)) {
+                // get current game id
+                int currentGameId = games.get(key);
+ 
+                // Fill the teamSelect ComboBox with the team names for the selected game
+                teamSelect.getItems().addAll(db.returnTeams(currentGameId));
+
+            } else {
+                v.displayAlertError("No game id was found. Please make sure to select a game first.", "No game found");
+            }
+
+        });
+
+        //Select game button to show current teams
+        Button confirmTeamButton = new Button("Confirm Team");
+        confirmTeamButton.setOnAction(event -> {
+            players = fillPHash(teamSelect);
+            getPlayers(playerSelect1, players);
+
+        });
+        //fill gameSelect combo box 
+        fillGameCombo(gameSelect, games);
+        //create a button box and add buttons for the top of the form
+        HBox buttonBox1 = new HBox(10);
+        buttonBox1.getChildren().add(instructionLabel);
+        buttonBox1.getChildren().add(gameSelect);
+        buttonBox1.getChildren().add(confirmGameButton);
+        buttonBox1.getChildren().add(teamSelect);
+        buttonBox1.getChildren().add(confirmTeamButton);
+        grid.add(buttonBox1, 0, 0, 15, 1);
 
         //Team select combo box        
         teamSelect.setPromptText("Select Team");
@@ -259,44 +293,7 @@ public class BatterStatsGUI extends Application {
         positionSelect9.setPromptText("Position");
 
 
-        //game select combo box
-        ComboBox<String> gameSelect = new ComboBox<>();
-        gameSelect.setPromptText("Select Game");
 
-        //button to show the teams for the selected game
-        Button teamButton = new Button("Select game");
-        teamButton.setOnAction(event -> {
-            String key = gameSelect.getSelectionModel().getSelectedItem();
-            // check key to avoid errors
-            if (games.containsKey(key)) {
-                // get current game id
-                int currentGameId = games.get(key);
-
-                // Fill the teamSelect ComboBox with the team names for the selected game
-                teamSelect.getItems().addAll(db.returnTeams(currentGameId));
-
-            } else {
-                v.displayAlertError("No game id was found. Please make sure to select a game first.", "No game found");
-            }
-
-        });
-
-        //Select game button to show current teams
-        Button selectGameButton = new Button("Select Team");
-        selectGameButton.setOnAction(event -> {
-            players = fillPHash(teamSelect);
-            getPlayers(playerSelect1, players);
-
-        });
-        //fill gameSelect combo box 
-        fillGameCombo(gameSelect, games);
-        //create a button box and add buttons for the top of the form
-        HBox buttonBox1 = new HBox(10);
-        buttonBox1.getChildren().add(gameSelect);
-        buttonBox1.getChildren().add(teamButton);
-        buttonBox1.getChildren().add(teamSelect);
-        buttonBox1.getChildren().add(selectGameButton);
-        grid.add(buttonBox1, 0, 0, 9, 1);
 
 
         //Add positions to team select boxex
