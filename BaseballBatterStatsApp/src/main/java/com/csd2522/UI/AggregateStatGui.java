@@ -15,8 +15,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,12 +30,12 @@ public class AggregateStatGui extends Application{
 
     /* LABELS */
     private Label teamIDLabel = new Label("Select Team to Generate stats");
-    private Label gameLabel = new Label("Select Game to Report");
+    private Label gameLabel = new Label("Select Game by date for Report");
     private Label seasonLabel = new Label("Generate Stats by season");
     
-    /* TEXTFIELDS */
-    private TextField startDateField = new TextField();
-    private TextField endDateField = new TextField();
+    /* DATEPICKER */
+    private DatePicker startDatePicker = new DatePicker();
+    private DatePicker endDatePicker = new DatePicker();
     
     /* COMBO BOXES */
     private ComboBox<String> teamIDBox = new ComboBox<String>();
@@ -51,7 +51,7 @@ public class AggregateStatGui extends Application{
         GridPane grid = new GridPane();
         
          // Scene
-        Scene scene = new Scene(grid);
+        Scene scene = new Scene(grid, 800, 150);
         
         // We want it to be alligned to the top left of the window
         grid.setAlignment(Pos.TOP_LEFT);
@@ -69,11 +69,10 @@ public class AggregateStatGui extends Application{
         Button seasonButton = new Button("Generate Stats by Season and Team");
         seasonButton.setOnAction(event -> seasonButtonClicked());
         
-        // Sets startDateField text (prompt)
-        startDateField.setPromptText("Start Date(YYYY-DD-MM)");
-        // Sets endDateField text(prompt)
-        endDateField.setPromptText("End Date (YYYY-DD-MM)");
-        
+        // Sets the label for the DatePickers
+        startDatePicker.setPromptText("Start Date");
+        endDatePicker.setPromptText("End Date");
+         
         // Sets the default value of teamIDBox
         teamIDBox.getSelectionModel().select(0);
         // Sets the default value of seasonBox
@@ -85,8 +84,8 @@ public class AggregateStatGui extends Application{
         
         HBox gameBox = new HBox(10);
         gameBox.getChildren().add(gameLabel);
-        gameBox.getChildren().add(startDateField);
-        gameBox.getChildren().add(endDateField);
+        gameBox.getChildren().add(startDatePicker);
+        gameBox.getChildren().add(endDatePicker);
         gameBox.getChildren().add(gameButton);
         
         HBox seasonHBox = new HBox(10);
