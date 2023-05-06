@@ -338,7 +338,7 @@ public class BatterDB {
     // have it print to a file, just like the project requires DC 4/25/2023
     public StringBuilder printGameToFile(int gameId) {
        
-        // build nest array list, index 0 holds team one/away teams batters, index 1 holds team two/home teams batters DC 4/30/2023
+        // build nest array list, iv cndex 0 holds team one/away teams batters, index 1 holds team two/home teams batters DC 4/30/2023
         ArrayList<ArrayList<Batter>> playersByTeam = batterStatsOneGame(gameId);
         ArrayList<Batter> awayTeamPlayers = playersByTeam.get(0);
         ArrayList<Batter> homeTeamPlayers = playersByTeam.get(1);
@@ -819,5 +819,119 @@ public class BatterDB {
             System.out.println(e);
         }
     }
+    
+    public StringBuilder statsByGame(String startDate, String endDate, String teamID){
+        String byGame = 
+        "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE "
+        + "Batter_stat_game_id = Game_id AND (Game_date Between ? AND ?)  AND "
+        + "Batter_stat_team_id = ?";
+        
+        ArrayList<Batter> batterList = new ArrayList<>();
+        
+        try(PreparedStatement ps = connection.prepareStatement(byGame)){
+                ps.setString(1, startDate);
+                ps.setString(2, endDate);
+                ps.setString(3, teamID);
+                
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    
+                    Batter player = returnPlayer(rs.getInt(1));
+                    
+                    batterList.add(player);
+                }
+        }
+        catch (SQLException e)
+        {        
+            System.out.println(e);
+        }
+        
+        StringBuilder fileSB = new StringBuilder(2000);
+        
+        //Start with header for player stats build as string DC 4/30/2023
+        String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + StringUtil.padWithSpaces("\nPlayer",35) + 
+                "slg" + "obp" + "ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR" + "Total Base\n";
+        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 83) + "\n");
+        for(Batter ply : batterList){
+            byGame = "SELECT SUM(Batter_stat_ab), Sum(Batter_stat_runs), Sum(Batter_stat_hits), Sum(Batter_stat_rbi), Sum(Batter_stat_bb), Sum(Batter_stat_so),"
+                    + "Sum(Batter_stat_po), Sum(Batter_stat_lob), Sum(Batter_stat_hbp), Sum(Batter_stat_FB), Sum(Batter_stat_SB), Sum(Batter_stat_TB), Sum(Batter_stat_hr),"
+                    + "Sum(Batter_stat_total_bases) FROM "
+                    + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
+                    + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
+                    + "AND (Game_date Between ? AND ?)";
+            
+            try(PreparedStatement ps = connection.prepareStatement(byGame)){
+                ps.setString(1, teamID);
+                ps.setInt(2, ply.getPlayerID());
+                ps.setString(3, startDate);
+                ps.setString(4, endDate);
+                
+                ResultSet rs = ps.executeQuery();
+                // Gets all the stats
+                int atBat = rs.getInt(1);
+                int runs = rs.getInt(2);
+                int hits = rs.getInt(3);
+                int rbi = rs.getInt(4);
+                int bb = rs.getInt(5);
+                int so = rs.getInt(6);
+                int hbp = rs.getInt(7);
+                int fb = rs.getInt(8);
+                int sb = rs.getInt(9);
+                int tb = rs.getInt(10);
+                int hr = rs.getInt(11);
+                int totalBase = rs.getInt(13);
+                
+                // sets all the stats
+                ply.setAB(atBat);
+                ply.setRuns(runs);
+                ply.setHits(hits);
+                ply.setRbi(rbi);
+                ply.setBb(bb);
+                ply.setSo(so);
+                ply.setHp(hbp);
+                ply.setFB(fb);
+                ply.setSB(sb);
+                ply.setTB(tb);
+                ply.setHR(hr);
+                ply.setTotalBase(totalBase);
+                double slg = ply.getSLG();
+                double obp = ply.getOBP();
+                
+                String playerHeadline = ply.getLastName() + ", " + ply.getFirstName() + " " + ply.getPosition();
+                fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
+                // build stats string based on batter instance DC 4/30/2023
+                String playerStats = StringUtil.padWithSpacesReverse(""+ply.getAB(), 1) + "  "
+                        + StringUtil.padWithSpacesReverse(""+slg, 1) + "  "
+                        + StringUtil.padWithSpacesReverse(""+obp, 1) + "  "
+                        + StringUtil.padWithSpacesReverse(""+ply.getRuns(), 1) + "  "
+                        + StringUtil.padWithSpacesReverse(""+ply.getHits(), 1) + "  "
+                        + StringUtil.padWithSpacesReverse(""+ply.getRbi(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getBb(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getSo(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getHp(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getFB(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getSB(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getTB(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getHR(), 2) + " "
+                        + StringUtil.padWithSpacesReverse(""+ply.getTotalBase(), 2) + " \n";
+                fileSB.append(playerStats);
+                //End away team
+                fileSB.append(StringUtil.repeatString("_", 83) + "\n");                
+            }
+            catch (SQLException e)
+            {        
+                System.out.println(e);
+            }
+        }
+            //print string build object to console as test, in future we will just print this whole string to the file
+            System.out.println(fileSB.toString());
 
+            // create file name
+            String fileName = "Aggregate Stats "+ teamID + " " + startDate + " till " + endDate;
+
+            //create file
+            FileOutPut.writeFile(fileSB.toString(),fileName);
+
+            return fileSB;
+    }
 }
