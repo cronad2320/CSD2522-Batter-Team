@@ -100,6 +100,8 @@ public class TeamLogGUI extends Application {
         // Creates a new validation object
         Validation v = new Validation();
         
+        
+       
         // Checks if all of the boxes are filled.
         if (!(awayComboBox.getSelectionModel().isEmpty()) && !(homeComboBox.getSelectionModel().isEmpty()) 
             && v.isPresent(awayScoreTextField.getText()) && v.isPresent(homeScoreTextField.getText())
@@ -154,9 +156,16 @@ public class TeamLogGUI extends Application {
                 }
             }
         } else {
+            if(gameDateBox.getValue() == null)
+            {
+                v.displayAlertError("Please select a valid date with the date picker", "Must use date picker calendar option to select date");
+            }
+            else
+            {
+                // Pops an error message up if the user fill in all boxes and check boxes
+                v.displayAlertError("Please fill in all options with valid data", "Incomplete");
+            }
             
-            // Pops an error message up if the user fill in all boxes and check boxes
-            v.displayAlertError("Please fill in all options with valid data", "Incomplete");
         }
     }//createGameButtonClicked
     
