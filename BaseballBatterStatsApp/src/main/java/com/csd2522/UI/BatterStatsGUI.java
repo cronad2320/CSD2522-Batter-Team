@@ -40,7 +40,8 @@ public class BatterStatsGUI extends Application {
 
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
-    int gameIDSelected;
+    int gameIDSelected = 0;
+    String teamID = "";
     private Label selectTeamLabel = new Label("Select Team to Show Players");
     ComboBox<String> gameSelect = new ComboBox<>();
 
@@ -223,7 +224,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(registerStatsButton);
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
-        registerStatsButton.setOnAction(e -> registerStats(gameIDSelected));
+        registerStatsButton.setOnAction(e -> registerStats(gameIDSelected, teamID));
         clearStatsButton.setOnAction(e -> resetForm());
 
         //game select combo box
@@ -258,6 +259,8 @@ public class BatterStatsGUI extends Application {
         confirmTeamButton.setOnAction(event -> {
             players = fillPHash(teamSelect);
             getPlayers(playerSelect1, players);
+            teamID = teamSelect.getSelectionModel().getSelectedItem();
+            System.out.println("team id confirmed: " + teamID);
 
         });
         //fill gameSelect combo box 
@@ -902,7 +905,7 @@ public class BatterStatsGUI extends Application {
         return treeMap;
     }
 
-    public ArrayList<Batter> registerStats(int gameID) {
+    public ArrayList<Batter> registerStats(int gameID, String teamID) {
         System.out.println(games);
         // reset duplicate selection flag
         boolean duplicateSelection = false;
@@ -914,7 +917,7 @@ public class BatterStatsGUI extends Application {
         
 
         //Pull current team
-        String teamID = teamSelect.getSelectionModel().getSelectedItem();
+        //String teamID = teamSelect.getSelectionModel().getSelectedItem();
         //go through each player
 
 //go through each player
