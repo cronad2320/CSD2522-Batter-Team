@@ -1000,29 +1000,29 @@ public class BatterStatsGUI extends Application {
          System.out.println("This fiels is empty and does not do null test: " + v.isInteger(firstBField2.getText()));
         // Check if all stats boxes are filled with valid integers
         if ( //player1
-                firstBField1.getText() != null && v.isInteger(firstBField1.getText()) || v.isInteger(secondBField1.getText()) || v.isInteger(thirdBField1.getText()) || v.isInteger(fourthBField1.getText()) || v.isInteger(abField1.getText()) || v.isInteger(runsField1.getText())
-                || v.isInteger(hitsField1.getText()) || v.isInteger(bbField1.getText()) || v.isInteger(soField1.getText()) || v.isInteger(hpField1.getText())
-                || //player2
-                v.isInteger(firstBField2.getText()) || v.isInteger(secondBField2.getText()) || v.isInteger(thirdBField2.getText()) || v.isInteger(fourthBField2.getText()) || v.isInteger(abField2.getText()) || v.isInteger(runsField2.getText())
-                || v.isInteger(hitsField2.getText()) || v.isInteger(bbField2.getText()) || v.isInteger(soField2.getText()) || v.isInteger(hpField2.getText())
-                || //player3
-                v.isInteger(firstBField3.getText()) || v.isInteger(secondBField3.getText()) || v.isInteger(thirdBField3.getText()) || v.isInteger(fourthBField3.getText()) || v.isInteger(abField3.getText()) || v.isInteger(runsField3.getText())
-                || v.isInteger(hitsField3.getText()) || v.isInteger(bbField3.getText()) || v.isInteger(soField3.getText()) || v.isInteger(hpField3.getText())
-                || //Player4
-                v.isInteger(firstBField4.getText()) || v.isInteger(secondBField4.getText()) || v.isInteger(thirdBField4.getText()) || v.isInteger(fourthBField4.getText()) || v.isInteger(abField4.getText()) || v.isInteger(runsField4.getText())
-                || v.isInteger(hitsField4.getText()) || v.isInteger(bbField4.getText()) || v.isInteger(soField4.getText()) || v.isInteger(hpField4.getText())
-                || //Player5
-                v.isInteger(firstBField5.getText()) || v.isInteger(secondBField5.getText()) || v.isInteger(thirdBField5.getText()) || v.isInteger(fourthBField5.getText()) || v.isInteger(abField5.getText()) || v.isInteger(runsField5.getText())
-                || v.isInteger(hitsField5.getText()) || v.isInteger(bbField5.getText()) || v.isInteger(soField5.getText()) || v.isInteger(hpField5.getText())
-                || //Player6
-                v.isInteger(firstBField6.getText()) || v.isInteger(secondBField6.getText()) || v.isInteger(thirdBField6.getText()) || v.isInteger(fourthBField6.getText()) || v.isInteger(abField6.getText()) || v.isInteger(runsField7.getText())
-                || v.isInteger(hitsField7.getText()) || v.isInteger(bbField6.getText()) || v.isInteger(soField6.getText()) || v.isInteger(hpField7.getText())
-                || //Player7
-                v.isInteger(firstBField7.getText()) || v.isInteger(secondBField7.getText()) || v.isInteger(thirdBField7.getText()) || v.isInteger(fourthBField7.getText()) || v.isInteger(abField7.getText()) || v.isInteger(runsField7.getText())
-                || v.isInteger(hitsField7.getText()) || v.isInteger(bbField7.getText()) || v.isInteger(soField7.getText()) || v.isInteger(hpField7.getText())
-                || //Player8
-                v.isInteger(firstBField9.getText()) || v.isInteger(secondBField9.getText()) || v.isInteger(thirdBField9.getText()) || v.isInteger(fourthBField9.getText()) || v.isInteger(abField9.getText()) || v.isInteger(runsField9.getText())
-                || v.isInteger(hitsField9.getText()) || v.isInteger(bbField9.getText()) || v.isInteger(soField9.getText()) || v.isInteger(hpField9.getText())) 
+                firstBField1.getText() != null && v.isInteger(firstBField1.getText()) && v.isInteger(secondBField1.getText()) && v.isInteger(thirdBField1.getText()) && v.isInteger(fourthBField1.getText()) && v.isInteger(abField1.getText()) && v.isInteger(runsField1.getText())
+                && v.isInteger(hitsField1.getText()) && v.isInteger(bbField1.getText()) && v.isInteger(soField1.getText()) && v.isInteger(hpField1.getText())
+                && //player2
+                v.isInteger(firstBField2.getText()) && v.isInteger(secondBField2.getText()) && v.isInteger(thirdBField2.getText()) && v.isInteger(fourthBField2.getText()) && v.isInteger(abField2.getText()) && v.isInteger(runsField2.getText())
+                && v.isInteger(hitsField2.getText()) && v.isInteger(bbField2.getText()) && v.isInteger(soField2.getText()) && v.isInteger(hpField2.getText())
+                && //player3
+                v.isInteger(firstBField3.getText()) && v.isInteger(secondBField3.getText()) && v.isInteger(thirdBField3.getText()) && v.isInteger(fourthBField3.getText()) && v.isInteger(abField3.getText()) && v.isInteger(runsField3.getText())
+                && v.isInteger(hitsField3.getText()) && v.isInteger(bbField3.getText()) && v.isInteger(soField3.getText()) && v.isInteger(hpField3.getText())
+                && //Player4
+                v.isInteger(firstBField4.getText()) && v.isInteger(secondBField4.getText()) && v.isInteger(thirdBField4.getText()) && v.isInteger(fourthBField4.getText()) && v.isInteger(abField4.getText()) && v.isInteger(runsField4.getText())
+                && v.isInteger(hitsField4.getText()) && v.isInteger(bbField4.getText()) && v.isInteger(soField4.getText()) && v.isInteger(hpField4.getText())
+                && //Player5
+                v.isInteger(firstBField5.getText()) && v.isInteger(secondBField5.getText()) && v.isInteger(thirdBField5.getText()) && v.isInteger(fourthBField5.getText()) && v.isInteger(abField5.getText()) && v.isInteger(runsField5.getText())
+                && v.isInteger(hitsField5.getText()) && v.isInteger(bbField5.getText()) && v.isInteger(soField5.getText()) && v.isInteger(hpField5.getText())
+                && //Player6
+                v.isInteger(firstBField6.getText()) && v.isInteger(secondBField6.getText()) && v.isInteger(thirdBField6.getText()) && v.isInteger(fourthBField6.getText()) && v.isInteger(abField6.getText()) && v.isInteger(runsField7.getText())
+                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField6.getText()) && v.isInteger(soField6.getText()) && v.isInteger(hpField7.getText())
+                && //Player7
+                v.isInteger(firstBField7.getText()) && v.isInteger(secondBField7.getText()) && v.isInteger(thirdBField7.getText()) && v.isInteger(fourthBField7.getText()) && v.isInteger(abField7.getText()) && v.isInteger(runsField7.getText())
+                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField7.getText()) && v.isInteger(soField7.getText()) && v.isInteger(hpField7.getText())
+                && //Player8
+                v.isInteger(firstBField9.getText()) && v.isInteger(secondBField9.getText()) && v.isInteger(thirdBField9.getText()) && v.isInteger(fourthBField9.getText()) && v.isInteger(abField9.getText()) && v.isInteger(runsField9.getText())
+                && v.isInteger(hitsField9.getText()) && v.isInteger(bbField9.getText()) && v.isInteger(soField9.getText()) && v.isInteger(hpField9.getText())) 
         { //if all data is valid
             System.out.println("no issues");
             return true;
