@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -67,13 +68,13 @@ public class BatterStatsGUI extends Application {
     private ComboBox<String> positionSelect8 = new ComboBox<>();
     private ComboBox<String> positionSelect9 = new ComboBox<>();
 
+    // initialize playerSelect and positionSelect arrays with combo boxes
     // get DB instance
     public BatterDB db = new BatterDB();
 
     Validation v = new Validation();
     private final HashMap<String, Integer> games = db.getTeams();
-    
-    
+
     //private final ArrayList<String> gameTeams = db.returnTeams(gameIdInt);
     private static TreeMap<String, Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
@@ -217,30 +218,23 @@ public class BatterStatsGUI extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        //Accept and clear buttons
-        Button registerStatsButton = new Button("Register Stats");
-        Button clearStatsButton = new Button("Clear Stats");
-        HBox buttonBox2 = new HBox(10);
-        buttonBox2.getChildren().add(registerStatsButton);
-        buttonBox2.getChildren().add(clearStatsButton);
-        grid.add(buttonBox2, 9, 20, 6, 2);
-        registerStatsButton.setOnAction(e -> registerStats(gameIDSelected, teamID));
-        clearStatsButton.setOnAction(e -> resetForm());
-
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
-        
+
+        //Set up buttons --BR
         //button to show the teams for the selected game
         Button confirmGameButton = new Button("Confirm Game");
         Label instructionLabel = new Label("Confirm game and team" + "\nto generate player list");
-        //set instrionLabel bold 
+        //set instructionLabel bold 
         Font font = Font.font("Arial", FontWeight.BOLD, 12);
         instructionLabel.setFont(font);
+        
+        //To confirm game and fill team combo box with only teams from current game --NR
         confirmGameButton.setOnAction(event -> {
             teamSelect.getItems().clear();
             String key = gameSelect.getSelectionModel().getSelectedItem();
-            // check key to avoid errors
+            // check key to avoid errors --NR
             if (games.containsKey(key)) {
                 // get current game id
                 gameIDSelected = games.get(key);
@@ -254,29 +248,54 @@ public class BatterStatsGUI extends Application {
 
         });
 
-        //Select game button to show current teams
+        //Select game button to show current teams -- NR
         Button confirmTeamButton = new Button("Confirm Team");
         confirmTeamButton.setOnAction(event -> {
             players = fillPHash(teamSelect);
-            getPlayers(playerSelect1, players);
+            for (int i = 0; i < 9; i++) {
+                getPlayers(playerSelect1, players);
+            }
             teamID = teamSelect.getSelectionModel().getSelectedItem();
             System.out.println("team id confirmed: " + teamID);
 
         });
-        //fill gameSelect combo box 
+
+        //fill gameSelect combo box -- NR 
         fillGameCombo(gameSelect, games);
-        //create a button box and add buttons for the top of the form
-        HBox buttonBox1 = new HBox(10);
+        
+        //First row of grid --NR
+        //create a button box and add buttons for the top of the form --NR
+        HBox buttonBox1 = new HBox(10); 
         buttonBox1.getChildren().add(instructionLabel);
         buttonBox1.getChildren().add(gameSelect);
         buttonBox1.getChildren().add(confirmGameButton);
         buttonBox1.getChildren().add(teamSelect);
         buttonBox1.getChildren().add(confirmTeamButton);
         grid.add(buttonBox1, 0, 0, 15, 1);
+        
 
-        //Team select combo box        
+        //Accept and clear buttons
+        Button registerStatsButton = new Button("Register Stats");
+        Button clearStatsButton = new Button("Clear Stats");
+        HBox buttonBox2 = new HBox(10);
+        buttonBox2.getChildren().add(registerStatsButton);
+        buttonBox2.getChildren().add(clearStatsButton);
+        grid.add(buttonBox2, 9, 20, 6, 2);
+        
+        registerStatsButton.setOnAction(e -> {
+    Boolean insertDecision = insertDections(); // call insertDections method from Validation class to validate input
+    
+    if (insertDecision) {
+        registerStats(gameIDSelected, teamID);
+    } else {
+        v.displayAlertError("Invalid input. Please review and try again.", "Input error"); // display error message if input is invalid
+    }
+});
+        
+        //Team select combo box  --NR
         teamSelect.setPromptText("Select Team");
-        // Player Select ComboBoxs labels 
+
+        // Player Select ComboBoxs labels --NR
         playerSelect1.setPromptText("Select Player");
         playerSelect2.setPromptText("Select Player");
         playerSelect3.setPromptText("Select Player");
@@ -287,7 +306,7 @@ public class BatterStatsGUI extends Application {
         playerSelect8.setPromptText("Select Player");
         playerSelect9.setPromptText("Select Player");
 
-        //Set prompt text for position select
+        //Set prompt text for position select -- NR
         positionSelect1.setPromptText("Position");
         positionSelect2.setPromptText("Position");
         positionSelect3.setPromptText("Position");
@@ -298,7 +317,7 @@ public class BatterStatsGUI extends Application {
         positionSelect8.setPromptText("Position");
         positionSelect9.setPromptText("Position");
 
-        //Add positions to team select boxex
+        //Add positions to team select boxex -- NR
         positionSelect1.getItems().addAll(positions);
         positionSelect2.getItems().addAll(positions);
         positionSelect3.getItems().addAll(positions);
@@ -309,7 +328,7 @@ public class BatterStatsGUI extends Application {
         positionSelect8.getItems().addAll(positions);
         positionSelect9.getItems().addAll(positions);
 
-        //create labels 
+        //create labels --NR
         //Player Labels
         Label player1 = new Label("Player 1");
         Label player2 = new Label("Player 2");
@@ -438,7 +457,7 @@ public class BatterStatsGUI extends Application {
         Label rbiLabel9 = new Label("RBI:");
         Label tbLabel9 = new Label("TB");
 
-        //Set widths
+        //Set widths --NR
         gameSelect.setPrefWidth(110);
         teamSelect.setPrefWidth(110);
 
@@ -578,7 +597,7 @@ public class BatterStatsGUI extends Application {
         rbiField9.setMaxWidth(30);
         tbField9.setMaxWidth(30);
 
-        //Add to grid
+        //Add everything to the grid -- NR
         //P1
         //First row
         grid.add(player1, 0, 2);
@@ -861,6 +880,7 @@ public class BatterStatsGUI extends Application {
 
     }
 
+    //Method to fill player combo boxes --NR
     public ComboBox<String> getPlayers(ComboBox<String> playerSelect, TreeMap<String, Integer> players) {
 
         String teamName = teamSelect.getSelectionModel().getSelectedItem();
@@ -869,8 +889,9 @@ public class BatterStatsGUI extends Application {
         if (players.size() != 0) {
 
             playerSelect.getItems().clear();
-
+            
             for (Map.Entry<String, Integer> element : players.entrySet()) {
+                //add players to combo boxes
                 playerSelect1.getItems().add(element.getKey());
                 playerSelect2.getItems().add(element.getKey());
                 playerSelect3.getItems().add(element.getKey());
@@ -890,6 +911,7 @@ public class BatterStatsGUI extends Application {
         return playerSelect;
     }
 
+    //fills team combo boxes --NR
     public static ComboBox<String> fillTeamSelect(ComboBox<String> iterateBox, ArrayList<String> teams) {
         for (String element : teams) {
             iterateBox.getItems().add(element);
@@ -897,7 +919,7 @@ public class BatterStatsGUI extends Application {
 
         return iterateBox;
     }
-
+//helps with filling player combo boxes --NR
     private TreeMap<String, Integer> fillPHash(ComboBox<String> teamSelect) {
         String team = teamSelect.getSelectionModel().getSelectedItem();
 
@@ -905,6 +927,7 @@ public class BatterStatsGUI extends Application {
         return treeMap;
     }
 
+    //registers the players batter stats ---NR
     public ArrayList<Batter> registerStats(int gameID, String teamID) {
         System.out.println(games);
         // reset duplicate selection flag
@@ -913,44 +936,14 @@ public class BatterStatsGUI extends Application {
         Validation v = new Validation();
         ArrayList<Batter> playerStats = new ArrayList<Batter>();
         System.out.println("game id is: " + gameID);
-       
-        
 
-        //Pull current team
-        //String teamID = teamSelect.getSelectionModel().getSelectedItem();
+
         //go through each player
-
-//go through each player
         for (int i = 1; i <= 9; i++) {
             duplicateSelection = false;
             // get player data
             String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
             String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
-
-            // check if playerID has already been selected
-            if (playerIds.contains(playerID)) {
-                v.displayAlertError("Player " + playerID + " has been selected more than once.", "PlayerID already used");
-                duplicateSelection = true;
-            } else {
-                // add playerID to set
-                playerIds.add(playerID);
-            }
-
-            // check if position has already been selected
-            if (positionsSet.contains(positionPicked)) {
-                v.displayAlertError("Position " + positionPicked + " has been chosen more than once.", "Position already used");
-                duplicateSelection = true;
-            } else {
-                // add position to set
-                positionsSet.add(positionPicked);
-            }
-
-            // check if either condition was true
-            if (duplicateSelection) {
-                // clear sets and return
-                playerIds.clear();
-                positionsSet.clear();
-            }
 
             //go through the rest of the entries
             String firstB = firstBField(i).getText();
@@ -965,7 +958,7 @@ public class BatterStatsGUI extends Application {
             String hp = hpField(i).getText();
             String rbi = rbiField(i).getText();
             String tb = tbField(i).getText();
-            
+
             //get playerID
             int playerIDint = this.players.get(playerID);
 
@@ -992,15 +985,166 @@ public class BatterStatsGUI extends Application {
 
             // add the Batter object to the ArrayList
             playerStats.add(player);
-
+            //call the insertBatterStats to insert data into the database
             db.insertBatterStats(player, gameID);
         }
 
 // Return the ArrayList of Batter objects containing the player stats
         return playerStats;
     }
-// helper methods to get the controls for the i-th player
+    
 
+//validates that all entry boxes have been filled out --NR
+    public boolean validateStats() {
+        // Check if all stats boxes are filled with valid integers
+        if ( //player1
+                firstBField1.getText() != null && v.isInteger(firstBField1.getText()) || v.isInteger(secondBField1.getText()) || v.isInteger(thirdBField1.getText()) || v.isInteger(fourthBField1.getText()) || v.isInteger(abField1.getText()) || v.isInteger(runsField1.getText())
+                || v.isInteger(hitsField1.getText()) || v.isInteger(bbField1.getText()) || v.isInteger(soField1.getText()) || v.isInteger(hpField1.getText())
+                || //player2
+                v.isInteger(firstBField2.getText()) || v.isInteger(secondBField2.getText()) || v.isInteger(thirdBField2.getText()) || v.isInteger(fourthBField2.getText()) || v.isInteger(abField2.getText()) || v.isInteger(runsField2.getText())
+                || v.isInteger(hitsField2.getText()) || v.isInteger(bbField2.getText()) || v.isInteger(soField2.getText()) || v.isInteger(hpField2.getText())
+                || //player3
+                v.isInteger(firstBField3.getText()) || v.isInteger(secondBField3.getText()) || v.isInteger(thirdBField3.getText()) || v.isInteger(fourthBField3.getText()) || v.isInteger(abField3.getText()) || v.isInteger(runsField3.getText())
+                || v.isInteger(hitsField3.getText()) || v.isInteger(bbField3.getText()) || v.isInteger(soField3.getText()) || v.isInteger(hpField3.getText())
+                || //Player4
+                v.isInteger(firstBField4.getText()) || v.isInteger(secondBField4.getText()) || v.isInteger(thirdBField4.getText()) || v.isInteger(fourthBField4.getText()) || v.isInteger(abField4.getText()) || v.isInteger(runsField4.getText())
+                || v.isInteger(hitsField4.getText()) || v.isInteger(bbField4.getText()) || v.isInteger(soField4.getText()) || v.isInteger(hpField4.getText())
+                || //Player5
+                v.isInteger(firstBField5.getText()) || v.isInteger(secondBField5.getText()) || v.isInteger(thirdBField5.getText()) || v.isInteger(fourthBField5.getText()) || v.isInteger(abField5.getText()) || v.isInteger(runsField5.getText())
+                || v.isInteger(hitsField5.getText()) || v.isInteger(bbField5.getText()) || v.isInteger(soField5.getText()) || v.isInteger(hpField5.getText())
+                || //Player6
+                v.isInteger(firstBField6.getText()) || v.isInteger(secondBField6.getText()) || v.isInteger(thirdBField6.getText()) || v.isInteger(fourthBField6.getText()) || v.isInteger(abField6.getText()) || v.isInteger(runsField7.getText())
+                || v.isInteger(hitsField7.getText()) || v.isInteger(bbField6.getText()) || v.isInteger(soField6.getText()) || v.isInteger(hpField7.getText())
+                || //Player7
+                v.isInteger(firstBField7.getText()) || v.isInteger(secondBField7.getText()) || v.isInteger(thirdBField7.getText()) || v.isInteger(fourthBField7.getText()) || v.isInteger(abField7.getText()) || v.isInteger(runsField7.getText())
+                || v.isInteger(hitsField7.getText()) || v.isInteger(bbField7.getText()) || v.isInteger(soField7.getText()) || v.isInteger(hpField7.getText())
+                || //Player8
+                v.isInteger(firstBField9.getText()) || v.isInteger(secondBField9.getText()) || v.isInteger(thirdBField9.getText()) || v.isInteger(fourthBField9.getText()) || v.isInteger(abField9.getText()) || v.isInteger(runsField9.getText())
+                || v.isInteger(hitsField9.getText()) || v.isInteger(bbField9.getText()) || v.isInteger(soField9.getText()) || v.isInteger(hpField9.getText())) 
+        { //if all data is valid
+            return true;
+        } else { //if data is not valid
+            return false;
+        }
+    }
+
+//Validates that player and position are only chosen once-- NR
+    public boolean validatePlayerAndPosition(String playerID, String positionPicked) {
+        boolean duplicateSelection = false;
+
+        // check if playerID has already been selected
+        if (playerIds.contains(playerID)) {
+            v.displayAlertError("Player " + playerID + " has been selected more than once.", "PlayerID already used");
+            duplicateSelection = true;
+        } else {
+            // add playerID to set
+            playerIds.add(playerID);
+        }
+
+        // check if position has already been selected
+        if (positionsSet.contains(positionPicked)) {
+            v.displayAlertError("Position " + positionPicked + " has been chosen more than once.", "Position already used");
+            duplicateSelection = true;
+        } else {
+            // add position to set
+            positionsSet.add(positionPicked);
+        }
+
+        // check if either condition was true
+        if (duplicateSelection) {
+            // clear sets and return
+            playerIds.clear();
+            positionsSet.clear();
+            return false;
+        }
+
+        return true;
+    }
+    
+    //method to call other validation methods in one space--NR
+        public Boolean insertDections() {
+        Validation v = new Validation();
+
+        // set bool to true by default, we will turn to false for any of the other checks
+        Boolean validEntries = true;
+
+        //first check game and team if either is true record t
+        if (teamID.equals("") || gameIDSelected == 0) {
+            v.displayAlertError("Confirm team and game", "Team or Game error"); // let user know to confirm 
+            validEntries = false;
+        }
+
+        //store result of method that checks all the stats boxes for valid entry/present
+        Boolean statsCheckValid = validateStats();
+        if (!statsCheckValid) {
+            //since at least one of the entries was wrong set validEntries to false
+            validEntries = false;
+            // let user know
+            v.displayAlertError("Missing entry or invalid integer provided", " Review player stats entered");
+        }
+
+        // loop through each player and position box and validate selection
+        for (int i = 0; i < 9; i++) {
+            String player = playerSelect(i).getSelectionModel().getSelectedItem();
+            String playerID = String.valueOf(this.players.get(player));
+            String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
+            Boolean resultPlayerPosCheck = validatePlayerAndPosition(playerID, positionPicked);
+            
+            
+
+            if (!resultPlayerPosCheck) {
+                //let user know that we had issue with players and positions
+                v.displayAlertError("Either a player or position selection was missing or we have a duplicate choice",
+                        "Review player and position selections");
+                //set to false since we know this step failed validation
+                validEntries = false;
+            }
+        }
+
+        //retrun boolean
+        return validEntries;
+    }
+        
+ //clears text fields and combo boxes.Also resets combo boxes and their prompt text --NR
+    public void resetForm() {
+// Clear all input fields
+        for (int i = 1; i <= 9; i++) {
+            firstBField(i).setText("");
+            secondBField(i).setText("");
+            thirdBField(i).setText("");
+            fourthBField(i).setText("");
+            abField(i).setText("");
+            runsField(i).setText("");
+            hitsField(i).setText("");
+            bbField(i).setText("");
+            soField(i).setText("");
+            hpField(i).setText("");
+            rbiField(i).setText("");
+            tbField(i).setText("");
+        }
+
+        // Reset drop-down menus
+        for (int i = 1; i <= 9; i++) {
+            playerSelect(i).getItems().clear();
+            playerSelect(i).getItems().add("Select Player");
+            playerSelect(i).getSelectionModel().selectFirst();
+            positionSelect(i).getItems().clear();
+            positionSelect(i).getItems().add("Select Position");
+            positionSelect(i).getSelectionModel().selectFirst();
+            positionSelect(i).getItems().addAll(positions);
+        }
+        //reset teamSelect box
+        teamSelect.getItems().clear();
+        teamSelect.getItems().add("Select Team");
+        teamSelect.getSelectionModel().selectFirst();
+
+        //clear validation sets
+        // Clear selected player and position sets
+        playerIds.clear();
+        positionsSet.clear();
+    }
+    
+// helper methods to get the controls for the i-th player --NR
     private ComboBox<String> playerSelect(int i) {
         switch (i) {
             case 1:
@@ -1345,43 +1489,6 @@ public class BatterStatsGUI extends Application {
         }
         return null;
 
-    }
-//clears text fields and combo boxes.Also resets combo boxes and their prompt text
-
-    public void resetForm() {
-// Clear all input fields
-        for (int i = 1; i <= 9; i++) {
-            firstBField(i).setText("");
-            secondBField(i).setText("");
-            thirdBField(i).setText("");
-            fourthBField(i).setText("");
-            abField(i).setText("");
-            runsField(i).setText("");
-            hitsField(i).setText("");
-            bbField(i).setText("");
-            soField(i).setText("");
-            hpField(i).setText("");
-            rbiField(i).setText("");
-            tbField(i).setText("");
-        }
-
-// Reset drop-down menus
-        for (int i = 1; i <= 9; i++) {
-            playerSelect(i).getItems().clear();
-            playerSelect(i).getItems().add("Select Player");
-            playerSelect(i).getSelectionModel().selectFirst();
-            positionSelect(i).getItems().clear();
-            positionSelect(i).getItems().add("Select Position");
-            positionSelect(i).getSelectionModel().selectFirst();
-            positionSelect(i).getItems().addAll(positions);
-        }
-        teamSelect.getItems().clear();
-        teamSelect.getItems().add("Select Team");
-        teamSelect.getSelectionModel().selectFirst();
-
-// Clear selected player and position sets
-        playerIds.clear();
-        positionsSet.clear();
     }
 
 }
