@@ -283,7 +283,7 @@ public class BatterStatsGUI extends Application {
         grid.add(buttonBox2, 9, 20, 6, 2);
         
         registerStatsButton.setOnAction(e -> {
-    Boolean insertDecision = insertDections(); // call insertDections method from Validation class to validate input
+    Boolean insertDecision = insertDecisions(); // call insertDections method from Validation class to validate input
     
     if (insertDecision) {
         registerStats(gameIDSelected, teamID);
@@ -1052,9 +1052,7 @@ public class BatterStatsGUI extends Application {
 
         // check if either condition was true
         if (duplicateSelection) {
-            // clear sets and return
-            playerIds.clear();
-            positionsSet.clear();
+            
             return false;
         }
 
@@ -1062,7 +1060,7 @@ public class BatterStatsGUI extends Application {
     }
     
     //method to call other validation methods in one space--NR
-        public Boolean insertDections() {
+        public Boolean insertDecisions() {
         Validation v = new Validation();
 
         // set bool to true by default, we will turn to false for any of the other checks
@@ -1073,6 +1071,46 @@ public class BatterStatsGUI extends Application {
             v.displayAlertError("Confirm team and game", "Team or Game error"); // let user know to confirm 
             validEntries = false;
         }
+        
+        // clear sets and return
+        playerIds.clear();
+        positionsSet.clear();
+        
+         // loop through each player and position box and validate selection
+        for (int i = 1; i <= 9; i++) {
+            int count = 0;
+            String playerId = "";
+            String positionPicked = "";
+
+            String player = playerSelect(i).getSelectionModel().getSelectedItem();
+            playerId = String.valueOf(this.players.get(player));
+            
+           
+            positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
+           
+            
+            
+            
+            Boolean resultPlayerPosCheck = validatePlayerAndPosition(playerId, positionPicked);
+            
+            
+
+            if (!resultPlayerPosCheck) {
+                if (count == 0)
+                {
+                    
+                    v.displayAlertError("There are either duplicate or missing entries on player or position selections", "Review player and position entires");
+                    count++;
+                }
+                
+                //set to false since we know this step failed validation
+                validEntries = false;
+            }
+        }
+        
+        
+        
+        
 
         //store result of method that checks all the stats boxes for valid entry/present
         Boolean statsCheckValid = validateStats();
@@ -1083,23 +1121,7 @@ public class BatterStatsGUI extends Application {
             v.displayAlertError("Missing entry or invalid integer provided", " Review player stats entered");
         }
 
-        // loop through each player and position box and validate selection
-        for (int i = 0; i < 9; i++) {
-            String player = playerSelect(i).getSelectionModel().getSelectedItem();
-            String playerID = String.valueOf(this.players.get(player));
-            String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
-            Boolean resultPlayerPosCheck = validatePlayerAndPosition(playerID, positionPicked);
-            
-            
-
-            if (!resultPlayerPosCheck) {
-                //let user know that we had issue with players and positions
-                v.displayAlertError("Either a player or position selection was missing or we have a duplicate choice",
-                        "Review player and position selections");
-                //set to false since we know this step failed validation
-                validEntries = false;
-            }
-        }
+        
 
         //retrun boolean
         return validEntries;
