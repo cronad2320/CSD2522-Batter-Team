@@ -554,7 +554,7 @@ public class BatterDB {
                 + "(Batter_stat_team_id, Batter_stat_player_id, Batter_stat_pos_id, "
                 + "Batter_stat_ab, Batter_stat_runs, Batter_stat_hits, Batter_stat_rbi, Batter_stat_bb, Batter_stat_so, Batter_stat_hbp,"
                 + " Batter_stat_FB, Batter_stat_SB, Batter_stat_TB, Batter_stat_hr, Batter_stat_total_bases, Batter_stat_game_id)"
-                +" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"))            
+                +" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"))            
         {    
                 //use take variables derived from batter passed to method above to define the value to insert for each field in insert statement DC 5/4/2023
                 ps.setString(1,team);
