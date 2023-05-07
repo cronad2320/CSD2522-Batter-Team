@@ -5,12 +5,13 @@
 package com.csd2522.UI;
 
 /**
- *Author: Nick Ryan 
- * Date: 5/6/2023
- * Purpose: Page displays batter stats gui and allows user to choose a game, team, and the players to enter stats for a game to submit to the database.
+ * Author: Nick Ryan Date: 5/6/2023 Purpose: Page displays batter stats gui and
+ * allows user to choose a game, team, and the players to enter stats for a game
+ * to submit to the database.
  */
 import com.csd2522.Batter.Batter;
 import com.csd2522.DB.BatterDB;
+import com.csd2522.ValidationFormat.StringUtil;
 import com.csd2522.ValidationFormat.Validation;
 
 import static com.csd2522.baseballbatterstatsapp.BatterGUIApp.fillGameCombo;
@@ -223,16 +224,16 @@ public class BatterStatsGUI extends Application {
         grid.add(buttonBox2, 9, 20, 6, 2);
         registerStatsButton.setOnAction(e -> registerStats());
         clearStatsButton.setOnAction(e -> resetForm());
-        
+
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
 
         //button to show the teams for the selected game
         Button confirmGameButton = new Button("Confirm Game");
-        Label instructionLabel = new Label ("Confirm game and team" + "\nto generate player list");
+        Label instructionLabel = new Label("Confirm game and team" + "\nto generate player list");
         //set instrionLabel bold 
-        Font font = Font.font("Arial" ,FontWeight.BOLD, 12);
+        Font font = Font.font("Arial", FontWeight.BOLD, 12);
         instructionLabel.setFont(font);
         confirmGameButton.setOnAction(event -> {
             String key = gameSelect.getSelectionModel().getSelectedItem();
@@ -240,7 +241,7 @@ public class BatterStatsGUI extends Application {
             if (games.containsKey(key)) {
                 // get current game id
                 int currentGameId = games.get(key);
- 
+
                 // Fill the teamSelect ComboBox with the team names for the selected game
                 teamSelect.getItems().addAll(db.returnTeams(currentGameId));
 
@@ -292,10 +293,6 @@ public class BatterStatsGUI extends Application {
         positionSelect8.setPromptText("Position");
         positionSelect9.setPromptText("Position");
 
-
-
-
-
         //Add positions to team select boxex
         positionSelect1.getItems().addAll(positions);
         positionSelect2.getItems().addAll(positions);
@@ -308,7 +305,6 @@ public class BatterStatsGUI extends Application {
         positionSelect9.getItems().addAll(positions);
 
         //create labels 
-
         //Player Labels
         Label player1 = new Label("Player 1");
         Label player2 = new Label("Player 2");
@@ -905,38 +901,50 @@ public class BatterStatsGUI extends Application {
     }
 
     public ArrayList<Batter> registerStats() {
+        // reset duplicate selection flag
+        boolean duplicateSelection = false;
+
         Validation v = new Validation();
         ArrayList<Batter> playerStats = new ArrayList<Batter>();
 
         //Pull current game saelected
         String gameID = gameSelect.getSelectionModel().getSelectedItem();
-        int gameIdInt = v.returnInteger(gameID);
 
         //Pull current team
         String teamID = teamSelect.getSelectionModel().getSelectedItem();
+        //go through each player
 
-
-        //loops through all players
+//go through each player
         for (int i = 1; i <= 9; i++) {
-            //get player data
+            // get player data
             String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
-            String positionSet = positionSelect(i).getSelectionModel().getSelectedItem();
+            String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
 
             // check if playerID has already been selected
             if (playerIds.contains(playerID)) {
-                System.out.println("Player " + playerID + " has been selected more than once.");
+                v.displayAlertError("Player " + playerID + " has been selected more than once.", "PlayerID already used");
+                duplicateSelection = true;
             } else {
                 // add playerID to set
                 playerIds.add(playerID);
             }
-            
+
             // check if position has already been selected
-            if (positions.contains(positionSet)) {
-                System.out.println("Position " + positionSet + " has been chosen more than once.");
+            if (positionsSet.contains(positionPicked)) {
+                v.displayAlertError("Position " + positionPicked + " has been chosen more than once.", "Position already used");
+                duplicateSelection = true;
             } else {
                 // add position to set
-                positions.add(positionSet);
+                positionsSet.add(positionPicked);
             }
+
+            // check if either condition was true
+            if (duplicateSelection) {
+                // clear sets and return
+                playerIds.clear();
+                positionsSet.clear();
+            }
+
             //go through the rest of the entries
             String firstB = firstBField(i).getText();
             String secondB = secondBField(i).getText();
@@ -950,9 +958,9 @@ public class BatterStatsGUI extends Application {
             String hp = hpField(i).getText();
             String rbi = rbiField(i).getText();
             String tb = tbField(i).getText();
-
-            //need playerID
-            int playerIDint = Integer.parseInt(playerID);
+            
+            //get playerID
+            int playerIDint = this.players.get(playerID);
 
             //get player name and team ID
             Batter playerN = db.returnPlayer(playerIDint);
@@ -961,7 +969,7 @@ public class BatterStatsGUI extends Application {
 
             // Create a new Batter object and populate it with the player's stats
             Batter player = new Batter(playerIDint, firstName, lastName, teamID);
-            player.setPosition(positionSet);
+            player.setPosition(positionPicked);
             player.setFB(v.returnInteger(firstB));
             player.setSB(v.returnInteger(secondB));
             player.setTB(v.returnInteger(thirdB));
@@ -975,393 +983,398 @@ public class BatterStatsGUI extends Application {
             player.setRbi(v.returnInteger(rbi));
             player.setTB(v.returnInteger(tb));
 
+            // add the Batter object to the ArrayList
+            playerStats.add(player);
+
             db.insertBatterStats(player, gameIdInt);
         }
 
 // Return the ArrayList of Batter objects containing the player stats
-    return playerStats ;
-}
-
+        return playerStats;
+    }
 // helper methods to get the controls for the i-th player
-private ComboBox<String> playerSelect(int i) {
-    switch(i) {
-        case 1:
-            return playerSelect1;
-        case 2:
-            return playerSelect2;
-        case 3:
-            return playerSelect3;
-        case 4:
-            return playerSelect4;
-        case 5:
-            return playerSelect5;
-        case 6:
-            return playerSelect6;
-        case 7:
-            return playerSelect7;
-        case 8:
-            return playerSelect8;
-        case 9:
-            return playerSelect9;
-    }
-        return null;
-}
 
-private ComboBox<String> positionSelect(int i) {
-    switch(i) {
-        case 1:
-            return positionSelect1;
-        case 2:
-            return positionSelect2;
-        case 3: 
-            return positionSelect3;
-        case 4:
-            return positionSelect4;
-        case 5:
-            return positionSelect5;
-        case 6:
-            return positionSelect6;
-        case 7:
-            return positionSelect7;
-        case 8:
-            return positionSelect8;
-        case 9:
-            return positionSelect9;    
-    }
+    private ComboBox<String> playerSelect(int i) {
+        switch (i) {
+            case 1:
+                return playerSelect1;
+            case 2:
+                return playerSelect2;
+            case 3:
+                return playerSelect3;
+            case 4:
+                return playerSelect4;
+            case 5:
+                return playerSelect5;
+            case 6:
+                return playerSelect6;
+            case 7:
+                return playerSelect7;
+            case 8:
+                return playerSelect8;
+            case 9:
+                return playerSelect9;
+        }
         return null;
-}
-
-private TextField firstBField(int i) {
-    switch(i) {
-        case 1:
-            return firstBField1;
-        case 2:
-            return firstBField2;
-        case 3:
-            return firstBField3;
-        case 4:
-            return firstBField4;
-        case 5:
-            return firstBField5;
-        case 6:
-            return firstBField6;
-        case 7:
-            return firstBField7;
-        case 8:
-            return firstBField8;
-        case 9:
-            return firstBField9;
-          
     }
-        return null;
-}
 
-private TextField secondBField(int i) {
-    switch(i) {
-        case 1:
-            return secondBField1;
-        case 2:
-            return secondBField2;
-        case 3:
-            return secondBField3;
-        case 4:
-            return secondBField4;
-        case 5:
-            return secondBField5;
-        case 6:
-            return secondBField6;
-        case 7:
-            return secondBField7;
-        case 8:
-            return secondBField8;
-        case 9:
-            return secondBField9;
-          
+    private ComboBox<String> positionSelect(int i) {
+        switch (i) {
+            case 1:
+                return positionSelect1;
+            case 2:
+                return positionSelect2;
+            case 3:
+                return positionSelect3;
+            case 4:
+                return positionSelect4;
+            case 5:
+                return positionSelect5;
+            case 6:
+                return positionSelect6;
+            case 7:
+                return positionSelect7;
+            case 8:
+                return positionSelect8;
+            case 9:
+                return positionSelect9;
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField thirdBField(int i) {
-    switch(i) {
-        case 1:
-            return thirdBField1;
-        case 2:
-            return thirdBField2;
-        case 3:
-            return thirdBField3;
-        case 4:
-            return thirdBField4;
-        case 5:
-            return thirdBField5;
-        case 6:
-            return thirdBField6;
-        case 7:
-            return thirdBField7;
-        case 8:
-            return thirdBField8;
-        case 9:
-            return thirdBField9;
-          
+    private TextField firstBField(int i) {
+        switch (i) {
+            case 1:
+                return firstBField1;
+            case 2:
+                return firstBField2;
+            case 3:
+                return firstBField3;
+            case 4:
+                return firstBField4;
+            case 5:
+                return firstBField5;
+            case 6:
+                return firstBField6;
+            case 7:
+                return firstBField7;
+            case 8:
+                return firstBField8;
+            case 9:
+                return firstBField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField fourthBField(int i) {
-    switch(i) {
-        case 1:
-            return fourthBField1;
-        case 2:
-            return fourthBField2;
-        case 3:
-            return fourthBField3;
-        case 4:
-            return fourthBField4;
-        case 5:
-            return fourthBField5;
-        case 6:
-            return fourthBField6;
-        case 7:
-            return fourthBField7;
-        case 8:
-            return fourthBField8;
-        case 9:
-            return fourthBField9;
-          
+    private TextField secondBField(int i) {
+        switch (i) {
+            case 1:
+                return secondBField1;
+            case 2:
+                return secondBField2;
+            case 3:
+                return secondBField3;
+            case 4:
+                return secondBField4;
+            case 5:
+                return secondBField5;
+            case 6:
+                return secondBField6;
+            case 7:
+                return secondBField7;
+            case 8:
+                return secondBField8;
+            case 9:
+                return secondBField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField abField(int i) {
-    switch(i) {
-        case 1:
-            return abField1;
-        case 2:
-            return abField2;
-        case 3:
-            return abField3;
-        case 4:
-            return abField4;
-        case 5:
-            return abField5;
-        case 6:
-            return abField6;
-        case 7:
-            return abField7;
-        case 8:
-            return abField8;
-        case 9:
-            return abField9;
-          
+    private TextField thirdBField(int i) {
+        switch (i) {
+            case 1:
+                return thirdBField1;
+            case 2:
+                return thirdBField2;
+            case 3:
+                return thirdBField3;
+            case 4:
+                return thirdBField4;
+            case 5:
+                return thirdBField5;
+            case 6:
+                return thirdBField6;
+            case 7:
+                return thirdBField7;
+            case 8:
+                return thirdBField8;
+            case 9:
+                return thirdBField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField runsField(int i) {
-    switch(i) {
-        case 1:
-            return runsField1;
-        case 2:
-            return runsField2;
-        case 3:
-            return runsField3;
-        case 4:
-            return runsField4;
-        case 5:
-            return runsField5;
-        case 6:
-            return runsField6;
-        case 7:
-            return runsField7;
-        case 8:
-            return runsField8;
-        case 9:
-            return runsField9;
-          
+    private TextField fourthBField(int i) {
+        switch (i) {
+            case 1:
+                return fourthBField1;
+            case 2:
+                return fourthBField2;
+            case 3:
+                return fourthBField3;
+            case 4:
+                return fourthBField4;
+            case 5:
+                return fourthBField5;
+            case 6:
+                return fourthBField6;
+            case 7:
+                return fourthBField7;
+            case 8:
+                return fourthBField8;
+            case 9:
+                return fourthBField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField hitsField(int i) {
-    switch(i) {
-        case 1:
-            return hitsField1;
-        case 2:
-            return hitsField2;
-        case 3:
-            return hitsField3;
-        case 4:
-            return hitsField4;
-        case 5:
-            return hitsField5;
-        case 6:
-            return hitsField6;
-        case 7:
-            return hitsField7;
-        case 8:
-            return hitsField8;
-        case 9:
-            return hitsField9;
-          
+    private TextField abField(int i) {
+        switch (i) {
+            case 1:
+                return abField1;
+            case 2:
+                return abField2;
+            case 3:
+                return abField3;
+            case 4:
+                return abField4;
+            case 5:
+                return abField5;
+            case 6:
+                return abField6;
+            case 7:
+                return abField7;
+            case 8:
+                return abField8;
+            case 9:
+                return abField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField bbField(int i) {
-    switch(i) {
-        case 1:
-            return bbField1;
-        case 2:
-            return bbField2;
-        case 3:
-            return bbField3;
-        case 4:
-            return bbField4;
-        case 5:
-            return bbField5;
-        case 6:
-            return bbField6;
-        case 7:
-            return bbField7;
-        case 8:
-            return bbField8;
-        case 9:
-            return bbField9;
-          
+    private TextField runsField(int i) {
+        switch (i) {
+            case 1:
+                return runsField1;
+            case 2:
+                return runsField2;
+            case 3:
+                return runsField3;
+            case 4:
+                return runsField4;
+            case 5:
+                return runsField5;
+            case 6:
+                return runsField6;
+            case 7:
+                return runsField7;
+            case 8:
+                return runsField8;
+            case 9:
+                return runsField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField soField(int i) {
-    switch(i) {
-        case 1:
-            return soField1;
-        case 2:
-            return soField2;
-        case 3:
-            return soField3;
-        case 4:
-            return soField4;
-        case 5:
-            return soField5;
-        case 6:
-            return soField6;
-        case 7:
-            return soField7;
-        case 8:
-            return soField8;
-        case 9:
-            return soField9;
-          
+    private TextField hitsField(int i) {
+        switch (i) {
+            case 1:
+                return hitsField1;
+            case 2:
+                return hitsField2;
+            case 3:
+                return hitsField3;
+            case 4:
+                return hitsField4;
+            case 5:
+                return hitsField5;
+            case 6:
+                return hitsField6;
+            case 7:
+                return hitsField7;
+            case 8:
+                return hitsField8;
+            case 9:
+                return hitsField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField hpField(int i) {
-    switch(i) {
-        case 1:
-            return hpField1;
-        case 2:
-            return hpField2;
-        case 3:
-            return hpField3;
-        case 4:
-            return hpField4;
-        case 5:
-            return hpField5;
-        case 6:
-            return hpField6;
-        case 7:
-            return hpField7;
-        case 8:
-            return hpField8;
-        case 9:
-            return hpField9;
+    private TextField bbField(int i) {
+        switch (i) {
+            case 1:
+                return bbField1;
+            case 2:
+                return bbField2;
+            case 3:
+                return bbField3;
+            case 4:
+                return bbField4;
+            case 5:
+                return bbField5;
+            case 6:
+                return bbField6;
+            case 7:
+                return bbField7;
+            case 8:
+                return bbField8;
+            case 9:
+                return bbField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField rbiField(int i) {
-    switch(i) {
-        case 1:
-            return rbiField1;
-        case 2:
-            return rbiField2;
-        case 3:
-            return rbiField3;
-        case 4:
-            return rbiField4;
-        case 5:
-            return rbiField5;
-        case 6:
-            return rbiField6;
-        case 7:
-            return rbiField7;
-        case 8:
-            return rbiField8;
-        case 9:
-            return rbiField9;
+    private TextField soField(int i) {
+        switch (i) {
+            case 1:
+                return soField1;
+            case 2:
+                return soField2;
+            case 3:
+                return soField3;
+            case 4:
+                return soField4;
+            case 5:
+                return soField5;
+            case 6:
+                return soField6;
+            case 7:
+                return soField7;
+            case 8:
+                return soField8;
+            case 9:
+                return soField9;
+
+        }
+        return null;
     }
-        return null;
-}
 
-private TextField tbField(int i) {
-    switch(i) {
-        case 1:
-            return tbField1;
-        case 2:
-            return tbField2;
-        case 3:
-            return tbField3;
-        case 4:
-            return tbField4;
-        case 5:
-            return tbField5;
-        case 6:
-            return tbField6;
-        case 7:
-            return tbField7;
-        case 8:
-            return tbField8;
-        case 9:
-            return tbField9;
+    private TextField hpField(int i) {
+        switch (i) {
+            case 1:
+                return hpField1;
+            case 2:
+                return hpField2;
+            case 3:
+                return hpField3;
+            case 4:
+                return hpField4;
+            case 5:
+                return hpField5;
+            case 6:
+                return hpField6;
+            case 7:
+                return hpField7;
+            case 8:
+                return hpField8;
+            case 9:
+                return hpField9;
+        }
+        return null;
     }
+
+    private TextField rbiField(int i) {
+        switch (i) {
+            case 1:
+                return rbiField1;
+            case 2:
+                return rbiField2;
+            case 3:
+                return rbiField3;
+            case 4:
+                return rbiField4;
+            case 5:
+                return rbiField5;
+            case 6:
+                return rbiField6;
+            case 7:
+                return rbiField7;
+            case 8:
+                return rbiField8;
+            case 9:
+                return rbiField9;
+        }
+        return null;
+    }
+
+    private TextField tbField(int i) {
+        switch (i) {
+            case 1:
+                return tbField1;
+            case 2:
+                return tbField2;
+            case 3:
+                return tbField3;
+            case 4:
+                return tbField4;
+            case 5:
+                return tbField5;
+            case 6:
+                return tbField6;
+            case 7:
+                return tbField7;
+            case 8:
+                return tbField8;
+            case 9:
+                return tbField9;
+        }
         return null;
 
-}
-//clears text fields and combo boxes.Also s
-public void resetForm() {
+    }
+//clears text fields and combo boxes.Also resets combo boxes and their prompt text
+
+    public void resetForm() {
 // Clear all input fields
-for (int i = 1; i <= 9; i++) {
-    firstBField(i).setText("");
-    secondBField(i).setText("");
-    thirdBField(i).setText("");
-    fourthBField(i).setText("");
-    abField(i).setText("");
-    runsField(i).setText("");
-    hitsField(i).setText("");
-    bbField(i).setText("");
-    soField(i).setText("");
-    hpField(i).setText("");
-    rbiField(i).setText("");
-    tbField(i).setText("");
-}
+        for (int i = 1; i <= 9; i++) {
+            firstBField(i).setText("");
+            secondBField(i).setText("");
+            thirdBField(i).setText("");
+            fourthBField(i).setText("");
+            abField(i).setText("");
+            runsField(i).setText("");
+            hitsField(i).setText("");
+            bbField(i).setText("");
+            soField(i).setText("");
+            hpField(i).setText("");
+            rbiField(i).setText("");
+            tbField(i).setText("");
+        }
 
 // Reset drop-down menus
-for (int i = 1; i <= 9; i++) {
-    playerSelect(i).getItems().clear();
-    playerSelect(i).getItems().add("Select Player");
-    playerSelect(i).getSelectionModel().selectFirst();
-    positionSelect(i).getItems().clear();
-    positionSelect(i).getItems().add("Select Position");
-    positionSelect(i).getSelectionModel().selectFirst();
-}
-teamSelect.getItems().clear();
-teamSelect.getItems().add("Select Team");
-teamSelect.getSelectionModel().selectFirst();
+        for (int i = 1; i <= 9; i++) {
+            playerSelect(i).getItems().clear();
+            playerSelect(i).getItems().add("Select Player");
+            playerSelect(i).getSelectionModel().selectFirst();
+            positionSelect(i).getItems().clear();
+            positionSelect(i).getItems().add("Select Position");
+            positionSelect(i).getSelectionModel().selectFirst();
+            positionSelect(i).getItems().addAll(positions);
+        }
+        teamSelect.getItems().clear();
+        teamSelect.getItems().add("Select Team");
+        teamSelect.getSelectionModel().selectFirst();
 
 // Clear selected player and position sets
-playerIds.clear();
-positions.clear();
-}
+        playerIds.clear();
+        positionsSet.clear();
+    }
 
 }
