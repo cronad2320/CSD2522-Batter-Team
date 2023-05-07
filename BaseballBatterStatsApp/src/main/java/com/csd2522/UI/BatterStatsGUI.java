@@ -282,7 +282,7 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
         
-        registerStatsButton.setOnAction(e -> {
+    registerStatsButton.setOnAction(e -> {
     Boolean insertDecision = insertDecisions(); // call insertDections method from Validation class to validate input
     
     if (insertDecision) {
@@ -996,6 +996,8 @@ public class BatterStatsGUI extends Application {
 
 //validates that all entry boxes have been filled out --NR
     public boolean validateStats() {
+         System.out.println("This field is empty and does null test: " + v.isInteger(firstBField1.getText()));
+         System.out.println("This fiels is empty and does not do null test: " + v.isInteger(firstBField2.getText()));
         // Check if all stats boxes are filled with valid integers
         if ( //player1
                 firstBField1.getText() != null && v.isInteger(firstBField1.getText()) || v.isInteger(secondBField1.getText()) || v.isInteger(thirdBField1.getText()) || v.isInteger(fourthBField1.getText()) || v.isInteger(abField1.getText()) || v.isInteger(runsField1.getText())
@@ -1022,8 +1024,10 @@ public class BatterStatsGUI extends Application {
                 v.isInteger(firstBField9.getText()) || v.isInteger(secondBField9.getText()) || v.isInteger(thirdBField9.getText()) || v.isInteger(fourthBField9.getText()) || v.isInteger(abField9.getText()) || v.isInteger(runsField9.getText())
                 || v.isInteger(hitsField9.getText()) || v.isInteger(bbField9.getText()) || v.isInteger(soField9.getText()) || v.isInteger(hpField9.getText())) 
         { //if all data is valid
+            System.out.println("no issues");
             return true;
         } else { //if data is not valid
+            System.out.println("issues");
             return false;
         }
     }
@@ -1110,11 +1114,12 @@ public class BatterStatsGUI extends Application {
         
         
         
+            System.out.println("outside validateStats check");
         
-
         //store result of method that checks all the stats boxes for valid entry/present
         Boolean statsCheckValid = validateStats();
         if (!statsCheckValid) {
+            System.out.println("issue validate states");
             //since at least one of the entries was wrong set validEntries to false
             validEntries = false;
             // let user know
