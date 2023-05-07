@@ -131,7 +131,7 @@ public class AggregateStatGui extends Application{
                 if(!(endDatePicker.getValue() == null)){
                     // String startDate, String endDate, String teamID
                     LocalDate selectedStartDate = startDatePicker.getValue();
-                    LocalDate selectedEndDate = startDatePicker.getValue();
+                    LocalDate selectedEndDate = endDatePicker.getValue();
                     
                     String formattedStartDate = selectedStartDate.format(DateTimeFormatter.ISO_DATE);
                     String formattedEndDate = selectedEndDate.format(DateTimeFormatter.ISO_DATE);

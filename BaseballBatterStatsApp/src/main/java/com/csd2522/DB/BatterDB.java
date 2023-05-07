@@ -821,23 +821,26 @@ public class BatterDB {
     }
     
     public ArrayList<Batter> statsByGame(String startDate, String endDate, String teamID){
+        System.out.println("Entered statsByGame");
+        System.out.println(startDate);
+        System.out.println(endDate);
         String byGame = 
         "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE "
-        + "Batter_stat_game_id = Game_id AND (Game_date Between ? AND ?)  AND "
+        + "Batter_stat_game_id = Game_id AND Game_date >= ?  AND "
         + "Batter_stat_team_id = ?";
         
         ArrayList<Batter> batterList = new ArrayList<>();
         
         try(PreparedStatement ps = connection.prepareStatement(byGame)){
                 ps.setString(1, startDate);
-                ps.setString(2, endDate);
-                ps.setString(3, teamID);
+                //ps.setString(2, endDate);
+                ps.setString(2, teamID);
                 
                 ResultSet rs = ps.executeQuery();
                 while(rs.next()){
-                    
+                    System.out.println("player id: " + rs.getInt(1));
                     Batter player = returnPlayer(rs.getInt(1));
-                    
+                    System.out.println("Player id is : " + player.getPlayerID() );
                     batterList.add(player);
                 }
         }
@@ -847,18 +850,20 @@ public class BatterDB {
         }
                 
         for(Batter ply : batterList){
+            System.out.println(ply.getPlayerID());
+            System.out.println("team id: " + teamID);
             byGame = "SELECT SUM(Batter_stat_ab), Sum(Batter_stat_runs), Sum(Batter_stat_hits), Sum(Batter_stat_rbi), Sum(Batter_stat_bb), Sum(Batter_stat_so),"
                     + "Sum(Batter_stat_po), Sum(Batter_stat_lob), Sum(Batter_stat_hbp), Sum(Batter_stat_FB), Sum(Batter_stat_SB), Sum(Batter_stat_TB), Sum(Batter_stat_hr),"
                     + "Sum(Batter_stat_total_bases) FROM "
                     + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
                     + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
-                    + "AND (Game_date Between ? AND ?)";
+                    + "AND Game_date >= ?";
             
             try(PreparedStatement ps = connection.prepareStatement(byGame)){
                 ps.setString(1, teamID);
                 ps.setInt(2, ply.getPlayerID());
                 ps.setString(3, startDate);
-                ps.setString(4, endDate);
+                //ps.setString(4, endDate);
                 
                 ResultSet rs = ps.executeQuery();
                 // Gets all the stats
@@ -874,7 +879,7 @@ public class BatterDB {
                 int tb = rs.getInt(10);
                 int hr = rs.getInt(11);
                 int totalBase = rs.getInt(13);
-                
+                System.out.println("at bat is:" + atBat);
                 // sets all the stats
                 ply.setAB(atBat);
                 ply.setRuns(runs);
@@ -887,13 +892,16 @@ public class BatterDB {
                 ply.setSB(sb);
                 ply.setTB(tb);
                 ply.setHR(hr);
-                ply.setTotalBase(totalBase);          
+                ply.setTotalBase(totalBase);    
+                
+                System.out.println(ply.getAB());
             }
             catch (SQLException e)
             {        
                 System.out.println(e);
             }
         }
+        System.out.println("batter list is: " + batterList);
         return batterList;
     }
     
@@ -906,12 +914,16 @@ public class BatterDB {
         ArrayList<Batter> batterList = new ArrayList<>();
         
         try(PreparedStatement ps = connection.prepareStatement(byGame)){
+                System.out.println("date: " + year + "-01-01");
+                System.out.println("date: " + year + "-12-31");
                 ps.setString(1, year + "-01-01");
+                //ps.setString(2, year + "-12-31");
                 ps.setString(2, teamID);
+                
                 
                 ResultSet rs = ps.executeQuery();
                 while(rs.next()){
-                    
+                    System.out.println("got here");
                     Batter player = returnPlayer(rs.getInt(1));
                     
                     batterList.add(player);
@@ -933,7 +945,7 @@ public class BatterDB {
             try(PreparedStatement ps = connection.prepareStatement(byGame)){
                 ps.setString(1, teamID);
                 ps.setInt(2, ply.getPlayerID());
-                ps.setString(3, year + "01-01");
+                ps.setString(3, year + "-01-01");
                 
                 ResultSet rs = ps.executeQuery();
                 // Gets all the stats
