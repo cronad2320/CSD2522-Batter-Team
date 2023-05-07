@@ -916,6 +916,7 @@ public class BatterStatsGUI extends Application {
 
 //go through each player
         for (int i = 1; i <= 9; i++) {
+            duplicateSelection = false;
             // get player data
             String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
             String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
