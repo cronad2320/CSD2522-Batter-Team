@@ -574,7 +574,7 @@ public class BatterDB {
                 ps.setInt(15,total);
                 ps.setInt(16, gameID);
                 
-             ps.executeQuery();   
+             ps.executeUpdate();   
             
         }
         catch (SQLException e)
