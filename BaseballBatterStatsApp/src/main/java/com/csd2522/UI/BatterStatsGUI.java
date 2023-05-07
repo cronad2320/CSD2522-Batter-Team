@@ -1035,7 +1035,7 @@ public class BatterStatsGUI extends Application {
 //Validates that player and position are only chosen once-- NR
     public boolean validatePlayerAndPosition(String playerID, String positionPicked) {
         boolean duplicateSelection = false;
-
+        
         // check if playerID has already been selected
         if (playerIds.contains(playerID)) {
             v.displayAlertError("Player " + playerID + " has been selected more than once.", "PlayerID already used");
