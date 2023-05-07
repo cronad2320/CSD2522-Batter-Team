@@ -237,6 +237,7 @@ public class BatterStatsGUI extends Application {
         Font font = Font.font("Arial", FontWeight.BOLD, 12);
         instructionLabel.setFont(font);
         confirmGameButton.setOnAction(event -> {
+            teamSelect.getItems().clear();
             String key = gameSelect.getSelectionModel().getSelectedItem();
             // check key to avoid errors
             if (games.containsKey(key)) {
