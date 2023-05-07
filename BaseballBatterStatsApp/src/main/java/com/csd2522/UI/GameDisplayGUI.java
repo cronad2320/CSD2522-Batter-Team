@@ -57,7 +57,7 @@ public class GameDisplayGUI {
         grid.setVgap(10);
         
         // create scene object and add grid layout to it added size of window DC 4//26/2023
-        Scene scene = new Scene(grid, 1000,1000);
+        Scene scene = new Scene(grid, 800,800);
         
         // create vbox 10 px padding between controls DC 4//26/2023
         VBox appContainer = new VBox(10);

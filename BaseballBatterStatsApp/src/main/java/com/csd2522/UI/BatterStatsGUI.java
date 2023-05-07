@@ -40,7 +40,7 @@ public class BatterStatsGUI extends Application {
 
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
-
+    int gameIDSelected;
     private Label selectTeamLabel = new Label("Select Team to Show Players");
     ComboBox<String> gameSelect = new ComboBox<>();
 
@@ -71,8 +71,9 @@ public class BatterStatsGUI extends Application {
 
     Validation v = new Validation();
     private final HashMap<String, Integer> games = db.getTeams();
-    int gameIdInt = v.returnInteger(gameSelect.getSelectionModel().getSelectedItem());
-    private final ArrayList<String> gameTeams = db.returnTeams(gameIdInt);
+    
+    
+    //private final ArrayList<String> gameTeams = db.returnTeams(gameIdInt);
     private static TreeMap<String, Integer> players = new TreeMap<>();
     private ArrayList<String> teams = db.getTeamIDs();
     private ArrayList<String> positions = db.getPositions();
@@ -222,13 +223,13 @@ public class BatterStatsGUI extends Application {
         buttonBox2.getChildren().add(registerStatsButton);
         buttonBox2.getChildren().add(clearStatsButton);
         grid.add(buttonBox2, 9, 20, 6, 2);
-        registerStatsButton.setOnAction(e -> registerStats());
+        registerStatsButton.setOnAction(e -> registerStats(gameIDSelected));
         clearStatsButton.setOnAction(e -> resetForm());
 
         //game select combo box
         ComboBox<String> gameSelect = new ComboBox<>();
         gameSelect.setPromptText("Select Game");
-
+        
         //button to show the teams for the selected game
         Button confirmGameButton = new Button("Confirm Game");
         Label instructionLabel = new Label("Confirm game and team" + "\nto generate player list");
@@ -240,10 +241,10 @@ public class BatterStatsGUI extends Application {
             // check key to avoid errors
             if (games.containsKey(key)) {
                 // get current game id
-                int currentGameId = games.get(key);
-
+                gameIDSelected = games.get(key);
+                System.out.println("game id confirmed: " + gameIDSelected);
                 // Fill the teamSelect ComboBox with the team names for the selected game
-                teamSelect.getItems().addAll(db.returnTeams(currentGameId));
+                teamSelect.getItems().addAll(db.returnTeams(gameIDSelected));
 
             } else {
                 v.displayAlertError("No game id was found. Please make sure to select a game first.", "No game found");
@@ -900,15 +901,16 @@ public class BatterStatsGUI extends Application {
         return treeMap;
     }
 
-    public ArrayList<Batter> registerStats() {
+    public ArrayList<Batter> registerStats(int gameID) {
+        System.out.println(games);
         // reset duplicate selection flag
         boolean duplicateSelection = false;
 
         Validation v = new Validation();
         ArrayList<Batter> playerStats = new ArrayList<Batter>();
-
-        //Pull current game saelected
-        String gameID = gameSelect.getSelectionModel().getSelectedItem();
+        System.out.println("game id is: " + gameID);
+       
+        
 
         //Pull current team
         String teamID = teamSelect.getSelectionModel().getSelectedItem();
@@ -987,7 +989,7 @@ public class BatterStatsGUI extends Application {
             // add the Batter object to the ArrayList
             playerStats.add(player);
 
-            db.insertBatterStats(player, gameIdInt);
+            db.insertBatterStats(player, gameID);
         }
 
 // Return the ArrayList of Batter objects containing the player stats
