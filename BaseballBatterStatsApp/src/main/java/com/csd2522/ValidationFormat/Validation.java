@@ -191,4 +191,14 @@ public class Validation {
         alert.setContentText(err);
         alert.showAndWait(); 
     }
+    // dispkay success DC 5/8/2023
+    public void displaySuccess(String mes, String header)
+    {
+        // create Alert error type, set header and content, then show
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(mes);
+        alert.showAndWait(); 
+    }
 }

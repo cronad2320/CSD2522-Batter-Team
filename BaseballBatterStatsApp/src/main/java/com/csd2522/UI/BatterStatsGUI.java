@@ -38,7 +38,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class BatterStatsGUI extends Application {
-
+    Stage successStage = new Stage();
+    
     //Team select combo
     private static ComboBox<String> teamSelect = new ComboBox<>();
     int gameIDSelected = 0;
@@ -928,19 +929,19 @@ public class BatterStatsGUI extends Application {
     }
 
     //registers the players batter stats ---NR
-    public ArrayList<Batter> registerStats(int gameID, String teamID) {
+    public void registerStats(int gameID, String teamID) {
         System.out.println(games);
         // reset duplicate selection flag
-        boolean duplicateSelection = false;
+        
 
         Validation v = new Validation();
-        ArrayList<Batter> playerStats = new ArrayList<Batter>();
+     
         System.out.println("game id is: " + gameID);
 
 
         //go through each player
         for (int i = 1; i <= 9; i++) {
-            duplicateSelection = false;
+            
             // get player data
             String playerID = playerSelect(i).getSelectionModel().getSelectedItem();
             String positionPicked = positionSelect(i).getSelectionModel().getSelectedItem();
@@ -983,14 +984,15 @@ public class BatterStatsGUI extends Application {
             player.setRbi(v.returnInteger(rbi));
             player.setTotalBase(v.returnInteger(tb));
 
-            // add the Batter object to the ArrayList
-            playerStats.add(player);
+            
             //call the insertBatterStats to insert data into the database
             db.insertBatterStats(player, gameID);
         }
+        
+        resetForm();
+        v.displaySuccess("Insert transaction succeded!", "Database Updated");
 
-// Return the ArrayList of Batter objects containing the player stats
-        return playerStats;
+
     }
     
 
