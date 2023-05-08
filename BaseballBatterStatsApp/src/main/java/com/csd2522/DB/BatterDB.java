@@ -908,14 +908,13 @@ public class BatterDB {
     public  ArrayList<Batter> statsBySeason(String teamID, String year){
         String byGame = 
         "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE "
-        + "Batter_stat_game_id = Game_id AND (Game_date >= ?)  AND "
+        + "Batter_stat_game_id = Game_id AND Game_Date >= ?  AND "
         + "Batter_stat_team_id = ?";
         
         ArrayList<Batter> batterList = new ArrayList<>();
         
         try(PreparedStatement ps = connection.prepareStatement(byGame)){
-                System.out.println("date: " + year + "-01-01");
-                System.out.println("date: " + year + "-12-31");
+                
                 ps.setString(1, year + "-01-01");
                 //ps.setString(2, year + "-12-31");
                 ps.setString(2, teamID);
@@ -940,12 +939,12 @@ public class BatterDB {
                     + "Sum(Batter_stat_total_bases) FROM "
                     + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
                     + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
-                    + "AND (Game_date >= ?)";
+                    + "AND Game_id >= ?";
             
             try(PreparedStatement ps = connection.prepareStatement(byGame)){
                 ps.setString(1, teamID);
                 ps.setInt(2, ply.getPlayerID());
-                ps.setString(3, year + "-01-01");
+               ps.setString(3, year + "-01-01");
                 
                 ResultSet rs = ps.executeQuery();
                 // Gets all the stats
