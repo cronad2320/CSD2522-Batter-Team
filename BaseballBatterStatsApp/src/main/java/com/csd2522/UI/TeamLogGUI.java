@@ -40,6 +40,7 @@ public class TeamLogGUI extends Application {
     private Label gameDateLabel = new Label("Game Date");
     private DatePicker gameDateBox = new DatePicker();
     private Button createGameButton = new Button("Create Game");
+    private Button clearButton = new Button("Clear");
     
     @Override
     public void start(Stage primaryStage) {
@@ -90,6 +91,8 @@ public class TeamLogGUI extends Application {
         grid.add(gameDateBox, 1, 2);
         createGameButton.setOnAction(event -> createGameButtonClicked());
         grid.add(createGameButton, 2, 2);
+        clearButton.setOnAction(event -> clearButtonClicked());
+        grid.add(clearButton, 3, 2);
         
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -100,74 +103,80 @@ public class TeamLogGUI extends Application {
         // Creates a new validation object
         Validation v = new Validation();
         
-        
-       
         // Checks if all of the boxes are filled.
         if (!(awayComboBox.getSelectionModel().isEmpty()) && !(homeComboBox.getSelectionModel().isEmpty()) 
             && v.isPresent(awayScoreTextField.getText()) && v.isPresent(homeScoreTextField.getText())
             && gameDateBox.getValue() != null) {
             
-            // Checks if the user entered unique integers for scores
-            if (v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText()) && !(awayScoreTextField.getText().equals(homeScoreTextField.getText()))) {
-                
-                // Creates a BatterDB object
-                BatterDB batterdb = new BatterDB();
+            // Checks if the user didn't choose the same team
+            if (!(awayComboBox.getSelectionModel().getSelectedItem().equals(homeComboBox.getSelectionModel().getSelectedItem()))) {
+            
+                // Checks if the user entered unique integers for scores
+                if (v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText()) && !(awayScoreTextField.getText().equals(homeScoreTextField.getText()))) {
 
-                // Gets the user's team choices
-                String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
-                String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
+                    // Creates a BatterDB object
+                    BatterDB batterdb = new BatterDB();
 
-                // get score from text fields
-                int awayScore = Integer.parseInt(awayScoreTextField.getText());
-                int homeScore = Integer.parseInt(homeScoreTextField.getText());
+                    // Gets the user's team choices
+                    String awayChoice = awayComboBox.getSelectionModel().getSelectedItem();
+                    String homeChoice = homeComboBox.getSelectionModel().getSelectedItem();
 
-                // Get the date
-                LocalDate date = gameDateBox.getValue();
-                String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
+                    // get score from text fields
+                    int awayScore = Integer.parseInt(awayScoreTextField.getText());
+                    int homeScore = Integer.parseInt(homeScoreTextField.getText());
 
-                // Send the information to the insertGame method of BatterDB to add the information to the Games table
-                batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
+                    // Get the date
+                    LocalDate date = gameDateBox.getValue();
+                    String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
 
-                // Clear the fields
-                homeComboBox.getSelectionModel().clearSelection();
-                homeComboBox.setPromptText("Select Home Team");
-                awayComboBox.getSelectionModel().clearSelection();
-                awayComboBox.setPromptText("Select Away Team");
+                    // Send the information to the insertGame method of BatterDB to add the information to the Games table
+                    batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);
 
-                homeScoreTextField.clear();
-                awayScoreTextField.clear();
-                homeScoreTextField.clear();
-                awayScoreTextField.clear();
-                gameDateBox.getEditor().clear();
-                gameDateBox.setValue(null);
+                    // Clear the fields
+                    clearButtonClicked();
 
-                // Close connection when done
-                batterdb.closeConnection();
+                    // Close connection when done
+                    batterdb.closeConnection();
 
-            } else {
-                if((awayScoreTextField.getText().equals(homeScoreTextField.getText())))
-                {
-                    // Pops up an error message if the user enters the same score for both teams
-                    v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
-                } else if (!(v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText())))
-                {
-                    // Let us know the integers are invalid
-                    v.displayAlertError("One of the scores is not a valid integer", "Use valid and unique integers");
+                } else {
+                    if((awayScoreTextField.getText().equals(homeScoreTextField.getText())))
+                    {
+                        // Pops up an error message if the user enters the same score for both teams
+                        v.displayAlertError("Fill all scores with unique scores", "Fill all scores with unique scores");
+                    } else if (!(v.isInteger(awayScoreTextField.getText()) && v.isInteger(homeScoreTextField.getText())))
+                    {
+                        // Let us know the integers are invalid
+                        v.displayAlertError("One of the scores is not a valid integer", "Use valid and unique integers");
+                    }
                 }
+            } else {
+                // Pops up an error message if the user chooses the same team
+                v.displayAlertError("Please enter two seperate teams.", "Same teams");
             }
         } else {
-            if(gameDateBox.getValue() == null)
-            {
+           
+            // Checks what isn't filled in and displays the error popup.
+            if (awayComboBox.getSelectionModel().isEmpty() || homeComboBox.getSelectionModel().isEmpty()
+               || !(v.isPresent(awayScoreTextField.getText())) || !(v.isPresent(homeScoreTextField.getText()))) {
+                v.displayAlertError("Please fill in all options with valid data", "Incomplete");
+            } else if (gameDateBox.getValue() == null) {
                 v.displayAlertError("Please select a valid date with the date picker", "Must use date picker calendar option to select date");
             }
-            else
-            {
-                // Pops an error message up if the user fill in all boxes and check boxes
-                v.displayAlertError("Please fill in all options with valid data", "Incomplete");
-            }
-            
         }
     }//createGameButtonClicked
     
-    
+    // Clears information entered by user when called
+    private void clearButtonClicked() {
+        
+        homeComboBox.getSelectionModel().clearSelection();
+        homeComboBox.setPromptText("Select Home Team");
+        awayComboBox.getSelectionModel().clearSelection();
+        awayComboBox.setPromptText("Select Away Team");
+
+        homeScoreTextField.clear();
+        awayScoreTextField.clear();
+        
+        gameDateBox.getEditor().clear();
+        gameDateBox.setValue(null);
+    }
 }//class
