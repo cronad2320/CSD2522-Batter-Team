@@ -4,7 +4,7 @@
  */
 package com.csd2522.UI;
 
-/**
+/** UPDATED -- 5-8-2023
  * Author: Nick Ryan Date: 5/6/2023 Purpose: Page displays batter stats gui and
  * allows user to choose a game, team, and the players to enter stats for a game
  * to submit to the database.
@@ -981,7 +981,7 @@ public class BatterStatsGUI extends Application {
             player.setSo(v.returnInteger(so));
             player.setHp(v.returnInteger(hp));
             player.setRbi(v.returnInteger(rbi));
-            player.setTB(v.returnInteger(tb));
+            player.setTotalBase(v.returnInteger(tb));
 
             // add the Batter object to the ArrayList
             playerStats.add(player);
@@ -996,38 +996,38 @@ public class BatterStatsGUI extends Application {
 
 //validates that all entry boxes have been filled out --NR
     public boolean validateStats() {
-         System.out.println("This field is empty and does null test: " + v.isInteger(firstBField1.getText()));
-         System.out.println("This fiels is empty and does not do null test: " + v.isInteger(firstBField2.getText()));
+
         // Check if all stats boxes are filled with valid integers
         if ( //player1
-                firstBField1.getText() != null && v.isInteger(firstBField1.getText()) && v.isInteger(secondBField1.getText()) && v.isInteger(thirdBField1.getText()) && v.isInteger(fourthBField1.getText()) && v.isInteger(abField1.getText()) && v.isInteger(runsField1.getText())
-                && v.isInteger(hitsField1.getText()) && v.isInteger(bbField1.getText()) && v.isInteger(soField1.getText()) && v.isInteger(hpField1.getText())
+                v.isInteger(firstBField1.getText()) && v.isInteger(secondBField1.getText()) && v.isInteger(thirdBField1.getText()) && v.isInteger(fourthBField1.getText()) && v.isInteger(abField1.getText()) && v.isInteger(runsField1.getText()) 
+                && v.isInteger(hitsField1.getText()) && v.isInteger(bbField1.getText()) && v.isInteger(soField1.getText()) && v.isInteger(hpField1.getText()) && v.isInteger(rbiField1.getText()) && v.isInteger(tbField1.getText()) 
                 && //player2
                 v.isInteger(firstBField2.getText()) && v.isInteger(secondBField2.getText()) && v.isInteger(thirdBField2.getText()) && v.isInteger(fourthBField2.getText()) && v.isInteger(abField2.getText()) && v.isInteger(runsField2.getText())
-                && v.isInteger(hitsField2.getText()) && v.isInteger(bbField2.getText()) && v.isInteger(soField2.getText()) && v.isInteger(hpField2.getText())
+                && v.isInteger(hitsField2.getText()) && v.isInteger(bbField2.getText()) && v.isInteger(soField2.getText()) && v.isInteger(hpField2.getText()) && v.isInteger(rbiField2.getText()) && v.isInteger(tbField2.getText()) 
                 && //player3
                 v.isInteger(firstBField3.getText()) && v.isInteger(secondBField3.getText()) && v.isInteger(thirdBField3.getText()) && v.isInteger(fourthBField3.getText()) && v.isInteger(abField3.getText()) && v.isInteger(runsField3.getText())
-                && v.isInteger(hitsField3.getText()) && v.isInteger(bbField3.getText()) && v.isInteger(soField3.getText()) && v.isInteger(hpField3.getText())
+                && v.isInteger(hitsField3.getText()) && v.isInteger(bbField3.getText()) && v.isInteger(soField3.getText()) && v.isInteger(hpField3.getText()) && v.isInteger(rbiField3.getText()) && v.isInteger(tbField3.getText()) 
                 && //Player4
                 v.isInteger(firstBField4.getText()) && v.isInteger(secondBField4.getText()) && v.isInteger(thirdBField4.getText()) && v.isInteger(fourthBField4.getText()) && v.isInteger(abField4.getText()) && v.isInteger(runsField4.getText())
-                && v.isInteger(hitsField4.getText()) && v.isInteger(bbField4.getText()) && v.isInteger(soField4.getText()) && v.isInteger(hpField4.getText())
+                && v.isInteger(hitsField4.getText()) && v.isInteger(bbField4.getText()) && v.isInteger(soField4.getText()) && v.isInteger(hpField4.getText()) && v.isInteger(rbiField4.getText()) && v.isInteger(tbField4.getText()) 
                 && //Player5
                 v.isInteger(firstBField5.getText()) && v.isInteger(secondBField5.getText()) && v.isInteger(thirdBField5.getText()) && v.isInteger(fourthBField5.getText()) && v.isInteger(abField5.getText()) && v.isInteger(runsField5.getText())
-                && v.isInteger(hitsField5.getText()) && v.isInteger(bbField5.getText()) && v.isInteger(soField5.getText()) && v.isInteger(hpField5.getText())
+                && v.isInteger(hitsField5.getText()) && v.isInteger(bbField5.getText()) && v.isInteger(soField5.getText()) && v.isInteger(hpField5.getText()) && v.isInteger(rbiField5.getText()) && v.isInteger(tbField5.getText()) 
                 && //Player6
                 v.isInteger(firstBField6.getText()) && v.isInteger(secondBField6.getText()) && v.isInteger(thirdBField6.getText()) && v.isInteger(fourthBField6.getText()) && v.isInteger(abField6.getText()) && v.isInteger(runsField7.getText())
-                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField6.getText()) && v.isInteger(soField6.getText()) && v.isInteger(hpField7.getText())
-                && //Player7
+                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField6.getText()) && v.isInteger(soField6.getText()) && v.isInteger(hpField7.getText()) && v.isInteger(rbiField6.getText()) && v.isInteger(tbField6.getText()) 
+                && //Player7 
                 v.isInteger(firstBField7.getText()) && v.isInteger(secondBField7.getText()) && v.isInteger(thirdBField7.getText()) && v.isInteger(fourthBField7.getText()) && v.isInteger(abField7.getText()) && v.isInteger(runsField7.getText())
-                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField7.getText()) && v.isInteger(soField7.getText()) && v.isInteger(hpField7.getText())
+                && v.isInteger(hitsField7.getText()) && v.isInteger(bbField7.getText()) && v.isInteger(soField7.getText()) && v.isInteger(hpField7.getText()) && v.isInteger(rbiField7.getText()) && v.isInteger(tbField7.getText()) 
+                && //Player8
+                 v.isInteger(firstBField8.getText()) && v.isInteger(secondBField8.getText()) && v.isInteger(thirdBField8.getText()) && v.isInteger(fourthBField8.getText()) && v.isInteger(abField8.getText()) && v.isInteger(runsField8.getText())
+                && v.isInteger(hitsField8.getText()) && v.isInteger(bbField8.getText()) && v.isInteger(soField8.getText()) && v.isInteger(hpField8.getText()) && v.isInteger(rbiField8.getText()) && v.isInteger(tbField8.getText()) 
                 && //Player8
                 v.isInteger(firstBField9.getText()) && v.isInteger(secondBField9.getText()) && v.isInteger(thirdBField9.getText()) && v.isInteger(fourthBField9.getText()) && v.isInteger(abField9.getText()) && v.isInteger(runsField9.getText())
-                && v.isInteger(hitsField9.getText()) && v.isInteger(bbField9.getText()) && v.isInteger(soField9.getText()) && v.isInteger(hpField9.getText())) 
+                && v.isInteger(hitsField9.getText()) && v.isInteger(bbField9.getText()) && v.isInteger(soField9.getText()) && v.isInteger(hpField9.getText()) && v.isInteger(rbiField9.getText()) && v.isInteger(tbField9.getText()) ) 
         { //if all data is valid
-            System.out.println("no issues");
             return true;
         } else { //if data is not valid
-            System.out.println("issues");
             return false;
         }
     }
@@ -1038,7 +1038,13 @@ public class BatterStatsGUI extends Application {
         
         // check if playerID has already been selected
         if (playerIds.contains(playerID)) {
-            v.displayAlertError("Player " + playerID + " has been selected more than once.", "PlayerID already used");
+            int player = Integer.parseInt(playerID);
+            Batter playerB = db.returnPlayer(player);
+            String playerFName = playerB.getFirstName();
+            String playerLName = playerB.getLastName();
+            
+            
+            v.displayAlertError("Player " + playerFName + " " + playerLName + " has been selected more than once.", "PlayerID already used");
             duplicateSelection = true;
         } else {
             // add playerID to set
