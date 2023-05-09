@@ -125,9 +125,10 @@ public class TeamLogGUI extends Application {
                     int awayScore = Integer.parseInt(awayScoreTextField.getText());
                     int homeScore = Integer.parseInt(homeScoreTextField.getText());
 
-                    // Get the date
+                    // Get the date   
+                   
                     LocalDate date = gameDateBox.getValue();
-                    String formattedDate = date.getYear() + "-" + date.getDayOfMonth() + "-" + date.getMonthValue();
+                    String formattedDate = date.format(DateTimeFormatter.ISO_DATE);
 
                     // Send the information to the insertGame method of BatterDB to add the information to the Games table
                     batterdb.insertGame(awayChoice, homeChoice, awayScore, homeScore, formattedDate);

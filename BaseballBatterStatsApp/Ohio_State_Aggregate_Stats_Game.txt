@@ -2,16 +2,52 @@
 Aggregate Batting Stats for Ohio State
 Player                            slgab  r  h rbi bb so hp 1B 2B 3B HR
 ________________________________________________________________________
-Karaffa, Nate null                 0% 0% 1  3  1   1  2  4  5  5  1  0  0  0 
-Brookman, Archer null              -% 0% 3  1  0   0  1  2  3  0  0  0  0  0 
-Dingler, Dillon null               0% 0% 1  2  4   3  1  2 57  2  1  0  1  0 
+Karaffa, Nate null                 2% 0% 1  6  4   4  5  7  5  5  4  3  3  3 
+Brookman, Archer null              6% 0% 8  6  7   7  8  9  3  0  7  5  5  5 
+Dingler, Dillon null               4% 0% 2  1  1  10  8  9 57  2  8 14 15 14 
 Todys, Brent null                  0% 0% 1  2  2   2  4  2  0  2  0  0  0  0 
 Pohl, Conner null                  1% 0% 1  2  3   4  2  4 17  4  0  0  3  0 
-Dezenzo, Zach null                 0% 0% 1  1  5   2  2  8  1  4  0  0  2  0 
+Dezenzo, Zach null                 4% 0% 2  1  1  16 16 22  1  4 14 13 15 13 
 Seymour, Scottie null              0% 0% 1  1  3   3  2  1  4  2  3  0  0  0 
-Clegg, Nolan null                  0% 0% 1  1  3   2  1  7  7 10  1  0  0  1 
-Carpenter, Matt null               0% 0% 1  0  0   0  1  7  8  1  0  0  0  0 
+Clegg, Nolan null                  4% 0% 2  1  1  13 12 18  7 10 12 10 10 11 
+Carpenter, Matt null               4% 0% 1  8  1  10 11 17  8  1 10  8  8  8 
 West, Noah null                    0% 0% 1  3  2   2  2  7  3  3  1  0  0  0 
+Dingler, Dillon null               4% 0% 2  1  1  10  8  9 57  2  8 14 15 14 
+Todys, Brent null                  0% 0% 1  2  2   2  4  2  0  2  0  0  0  0 
+Pohl, Conner null                  1% 0% 1  2  3   4  2  4 17  4  0  0  3  0 
+Dezenzo, Zach null                 4% 0% 2  1  1  16 16 22  1  4 14 13 15 13 
+Brookman, Archer null              6% 0% 8  6  7   7  8  9  3  0  7  5  5  5 
 Wilson, Sam null                   -% 0% 2  0  0   0  1  0  1  0  0  0  0  0 
+Clegg, Nolan null                  4% 0% 2  1  1  13 12 18  7 10 12 10 10 11 
+Seymour, Scottie null              0% 0% 1  1  3   3  2  1  4  2  3  0  0  0 
+West, Noah null                    0% 0% 1  3  2   2  2  7  3  3  1  0  0  0 
+Karaffa, Nate null                 2% 0% 1  6  4   4  5  7  5  5  4  3  3  3 
+Dingler, Dillon null               4% 0% 2  1  1  10  8  9 57  2  8 14 15 14 
+Todys, Brent null                  0% 0% 1  2  2   2  4  2  0  2  0  0  0  0 
+Pohl, Conner null                  1% 0% 1  2  3   4  2  4 17  4  0  0  3  0 
+Dezenzo, Zach null                 4% 0% 2  1  1  16 16 22  1  4 14 13 15 13 
+Seymour, Scottie null              0% 0% 1  1  3   3  2  1  4  2  3  0  0  0 
+Clegg, Nolan null                  4% 0% 2  1  1  13 12 18  7 10 12 10 10 11 
+Carpenter, Matt null               4% 0% 1  8  1  10 11 17  8  1 10  8  8  8 
+West, Noah null                    0% 0% 1  3  2   2  2  7  3  3  1  0  0  0 
+Karaffa, Nate null                 2% 0% 1  6  4   4  5  7  5  5  4  3  3  3 
+Dingler, Dillon null               4% 0% 2  1  1  10  8  9 57  2  8 14 15 14 
+Todys, Brent null                  0% 0% 1  2  2   2  4  2  0  2  0  0  0  0 
+Pohl, Conner null                  1% 0% 1  2  3   4  2  4 17  4  0  0  3  0 
+Dezenzo, Zach null                 4% 0% 2  1  1  16 16 22  1  4 14 13 15 13 
+Seymour, Scottie null              0% 0% 1  1  3   3  2  1  4  2  3  0  0  0 
+Clegg, Nolan null                  4% 0% 2  1  1  13 12 18  7 10 12 10 10 11 
+Carpenter, Matt null               4% 0% 1  8  1  10 11 17  8  1 10  8  8  8 
+West, Noah null                    0% 0% 1  3  2   2  2  7  3  3  1  0  0  0 
+Bauer, Colten null                 1% 0% 3  3  5   5  5  5  0  0  5  3  3  3 
+Brookman, Archer null              6% 0% 8  6  7   7  8  9  3  0  7  5  5  5 
+Ernst, Marcus null                 9% 0% 9  9  1  12 12 12  0  0 12  9  9  9 
+Erwin, Nick null                   9% 0% 1  1  1  10 10 10  0  0 10 10 10 10 
+Hughes, Aaron null                 9% 0% 1  1  1   9 15 15  0  0 15 14 14 14 
+Bauer, Colten null                 1% 0% 3  3  5   5  5  5  0  0  5  3  3  3 
+Carpenter, Matt null               4% 0% 1  8  1  10 11 17  8  1 10  8  8  8 
+Karaffa, Nate null                 2% 0% 1  6  4   4  5  7  5  5  4  3  3  3 
+Ernst, Marcus null                 9% 0% 9  9  1  12 12 12  0  0 12  9  9  9 
+Hughes, Aaron null                 9% 0% 1  1  1   9 15 15  0  0 15 14 14 14 
 ________________________________________________________________________
 
