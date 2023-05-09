@@ -278,6 +278,9 @@ public class BatterStatsGUI extends Application {
         //Accept and clear buttons
         Button registerStatsButton = new Button("Register Stats");
         Button clearStatsButton = new Button("Clear Stats");
+          clearStatsButton.setOnAction(e -> {
+             resetForm(); 
+          });
         HBox buttonBox2 = new HBox(10);
         buttonBox2.getChildren().add(registerStatsButton);
         buttonBox2.getChildren().add(clearStatsButton);
