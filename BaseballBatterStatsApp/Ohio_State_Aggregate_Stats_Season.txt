@@ -2,5 +2,20 @@
 Aggregate Batting Stats for Ohio State
 Player                            slgab  r  h rbi bb so hp 1B 2B 3B HR
 ________________________________________________________________________
+Karaffa, Nate null                 -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Brookman, Archer null              -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Dingler, Dillon null               -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Todys, Brent null                  -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Pohl, Conner null                  -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Dezenzo, Zach null                 -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Seymour, Scottie null              -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Clegg, Nolan null                  -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Carpenter, Matt null               -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+West, Noah null                    -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Wilson, Sam null                   -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Bauer, Colten null                 -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Ernst, Marcus null                 -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Erwin, Nick null                   -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
+Hughes, Aaron null                 -% -% 0  0  0   0  0  0  0  0  0  0  0  0 
 ________________________________________________________________________
 

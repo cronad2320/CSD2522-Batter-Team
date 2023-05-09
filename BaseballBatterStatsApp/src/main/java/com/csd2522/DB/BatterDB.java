@@ -825,16 +825,16 @@ public class BatterDB {
         System.out.println(startDate);
         System.out.println(endDate);
         String byGame = 
-        "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE "
-        + "Batter_stat_game_id = Game_id AND Game_date >= ?  AND "
-        + "Batter_stat_team_id = ?";
+       "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE " 
+       + "Batter_stat_game_id = Game_id  AND Batter_stat_team_id = ?  AND Game_date >= DATE(?)"
+                + " AND Game_date <= DATE(?)";
         
         ArrayList<Batter> batterList = new ArrayList<>();
         
         try(PreparedStatement ps = connection.prepareStatement(byGame)){
-                ps.setString(1, startDate);
-                //ps.setString(2, endDate);
-                ps.setString(2, teamID);
+                ps.setString(1, teamID);
+                ps.setString(2, startDate);
+                ps.setString(3, endDate);
                 
                 ResultSet rs = ps.executeQuery();
                 while(rs.next()){
@@ -857,13 +857,13 @@ public class BatterDB {
                     + "Sum(Batter_stat_total_bases) FROM "
                     + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
                     + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
-                    + "AND Game_date >= ?";
+                    + "AND Game_date >= DATE(?) AND Game_date <= DATE(?)";
             
             try(PreparedStatement ps = connection.prepareStatement(byGame)){
                 ps.setString(1, teamID);
                 ps.setInt(2, ply.getPlayerID());
                 ps.setString(3, startDate);
-                //ps.setString(4, endDate);
+                ps.setString(4, endDate);
                 
                 ResultSet rs = ps.executeQuery();
                 // Gets all the stats
