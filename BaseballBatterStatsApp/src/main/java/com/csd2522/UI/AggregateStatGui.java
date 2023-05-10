@@ -138,7 +138,7 @@ public class AggregateStatGui extends Application{
                     
                     batterList = bdb.statsByGame(formattedStartDate, formattedEndDate, selectedIndex);
                     
-                    StringBuilder batterBuilder = bdb.printStatsToFile(batterList, selectedIndex, "Game");
+                    StringBuilder batterBuilder = bdb.printStatsToFile(batterList, selectedIndex, "Games_", formattedStartDate + " to " + formattedEndDate);
                     
                     new GameDisplayGUI().start(stage, batterBuilder);
                 }
@@ -178,10 +178,15 @@ public class AggregateStatGui extends Application{
         
         if(!(teamIDSelectedValue == "TeamID")){
             if(!(seasonSelectedValue == "Year")){
+                String startDate = seasonSelectedValue + "-01-01";
+                String endDate = seasonSelectedValue + "-12-31";
                 
-                batterList = bdb.statsBySeason(teamIDSelectedValue, seasonSelectedValue);
                 
-                StringBuilder batterBuilder = bdb.printStatsToFile(batterList, teamIDSelectedValue, "Season");
+                batterList = bdb.statsByGame(startDate, endDate, teamIDSelectedValue);
+                
+                
+                
+                StringBuilder batterBuilder = bdb.printStatsToFile(batterList, teamIDSelectedValue, "Season_", startDate + " to " + endDate);
                 
                 new GameDisplayGUI().start(stage, batterBuilder);
             }

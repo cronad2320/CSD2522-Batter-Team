@@ -56,33 +56,7 @@ public class BatterDB {
         }
     }
     
-    public void printPlayers() {
-         try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM TEST"))            
-        {
-            
-            // create ResultSet object
-            ResultSet rs = ps.executeQuery();
-            
-            
-            //as long as there is a result in result set we will continue going
-            while (rs.next())
-            {
-                //use column names and result set to get data for code, description price from first record
-                int ID = rs.getInt(1);
-                String name = rs.getString(2);
-                
-                
-                System.out.println(name);
-            }
-            
-            rs.close();
-        }
-        catch (SQLException e)
-        {       
-            System.out.println("Error in query");
-            System.out.println(e);
-        }    
-    }
+    
     // method to return an arraylist of positions based on positions entered in Positions table in database. This way our positions stay standardized between pages DC 5/4/2023
     public ArrayList<String> getPositions() {
         ArrayList<String> positions = new ArrayList<>();
@@ -116,6 +90,44 @@ public class BatterDB {
         }    
         
         return positions;
+    }
+    
+    //getPosition will send a playerID and get a position as a string back DC 5/9/2023
+    public String getPosition(int playerID)
+    {
+        String position = "";
+        
+        try(PreparedStatement ps = connection.prepareStatement("SELECT Batter_stat_pos_id FROM Batter_stats "
+                 + "WHERE Batter_stat_player_id = ? "))            
+        {
+            
+            //tell us what the ? paramter will take value of teamId passed to this method this should filter players to ones assigned to team DC 4/26/2023
+            ps.setInt(1,playerID);
+            
+            // create ResultSet object DC 4/26/2023
+            ResultSet rs = ps.executeQuery();
+            
+            
+            rs.next();
+            // get variables to build Batter object 4/26/2023
+            position = rs.getString(1);
+            
+            System.out.println("position is: " + position);
+            
+          
+            
+            
+            rs.close();
+            
+            
+        }
+        catch (SQLException e)
+        {       
+            System.out.println("Error in query filling players");
+            System.out.println(e);
+        } 
+        return position;
+        
     }
     
     // return Batter object with player id, player last name, and player first name, and player team based on player id passed to this function DC 4/26/2023
@@ -821,9 +833,7 @@ public class BatterDB {
     }
     
     public ArrayList<Batter> statsByGame(String startDate, String endDate, String teamID){
-        System.out.println("Entered statsByGame");
-        System.out.println(startDate);
-        System.out.println(endDate);
+        
         String byGame = 
        "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE " 
        + "Batter_stat_game_id = Game_id  AND Batter_stat_team_id = ?  AND Game_date >= DATE(?)"
@@ -838,9 +848,8 @@ public class BatterDB {
                 
                 ResultSet rs = ps.executeQuery();
                 while(rs.next()){
-                    System.out.println("player id: " + rs.getInt(1));
+                    
                     Batter player = returnPlayer(rs.getInt(1));
-                    System.out.println("Player id is : " + player.getPlayerID() );
                     batterList.add(player);
                 }
         }
@@ -853,9 +862,8 @@ public class BatterDB {
             System.out.println(ply.getPlayerID());
             System.out.println("team id: " + teamID);
             byGame = "SELECT SUM(Batter_stat_ab), Sum(Batter_stat_runs), Sum(Batter_stat_hits), Sum(Batter_stat_rbi), Sum(Batter_stat_bb), Sum(Batter_stat_so),"
-                    + "Sum(Batter_stat_po), Sum(Batter_stat_lob), Sum(Batter_stat_hbp), Sum(Batter_stat_FB), Sum(Batter_stat_SB), Sum(Batter_stat_TB), Sum(Batter_stat_hr),"
-                    + "Sum(Batter_stat_total_bases) FROM "
-                    + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
+                    + "Sum(Batter_stat_hbp), Sum(Batter_stat_FB), Sum(Batter_stat_SB), Sum(Batter_stat_TB), Sum(Batter_stat_hr), Sum(Batter_stat_total_bases)"
+                    + " FROM Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
                     + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
                     + "AND Game_date >= DATE(?) AND Game_date <= DATE(?)";
             
@@ -878,9 +886,11 @@ public class BatterDB {
                 int sb = rs.getInt(9);
                 int tb = rs.getInt(10);
                 int hr = rs.getInt(11);
-                int totalBase = rs.getInt(13);
-                System.out.println("at bat is:" + atBat);
+                int totalBase = rs.getInt(12);
+                String position = getPosition(ply.getPlayerID());
+                
                 // sets all the stats
+                ply.setPosition(position);
                 ply.setAB(atBat);
                 ply.setRuns(runs);
                 ply.setHits(hits);
@@ -905,92 +915,12 @@ public class BatterDB {
         return batterList;
     }
     
-    public  ArrayList<Batter> statsBySeason(String teamID, String year){
-        String byGame = 
-        "SELECT DISTINCT Batter_stat_player_id FROM Batter_Stats, Games WHERE "
-        + "Batter_stat_game_id = Game_id AND Game_Date >= ?  AND "
-        + "Batter_stat_team_id = ?";
-        
-        ArrayList<Batter> batterList = new ArrayList<>();
-        
-        try(PreparedStatement ps = connection.prepareStatement(byGame)){
-                
-                ps.setString(1, year + "-01-01");
-                //ps.setString(2, year + "-12-31");
-                ps.setString(2, teamID);
-                
-                
-                ResultSet rs = ps.executeQuery();
-                while(rs.next()){
-                    System.out.println("got here");
-                    Batter player = returnPlayer(rs.getInt(1));
-                    
-                    batterList.add(player);
-                }
-        }
-        catch (SQLException e)
-        {        
-            System.out.println(e);
-        }
-        ArrayList<Batter> updatedBatterList = new ArrayList<>();
-        for(Batter ply : batterList){
-            byGame = "SELECT SUM(Batter_stat_ab), Sum(Batter_stat_runs), Sum(Batter_stat_hits), Sum(Batter_stat_rbi), Sum(Batter_stat_bb), Sum(Batter_stat_so),"
-                    + "Sum(Batter_stat_po), Sum(Batter_stat_lob), Sum(Batter_stat_hbp), Sum(Batter_stat_FB), Sum(Batter_stat_SB), Sum(Batter_stat_TB), Sum(Batter_stat_hr),"
-                    + "Sum(Batter_stat_total_bases) FROM "
-                    + "Batter_stats, Games WHERE Batter_stat_game_id = Game_id  "
-                    + "AND Batter_stat_team_id = ? AND Batter_stat_player_id = ? "
-                    + "AND Game_id >= ?";
-            
-            try(PreparedStatement ps = connection.prepareStatement(byGame)){
-                ps.setString(1, teamID);
-                ps.setInt(2, ply.getPlayerID());
-               ps.setString(3, year + "-01-01");
-                
-                ResultSet rs = ps.executeQuery();
-                // Gets all the stats
-                int atBat = rs.getInt(1);
-                int runs = rs.getInt(2);
-                int hits = rs.getInt(3);
-                int rbi = rs.getInt(4);
-                int bb = rs.getInt(5);
-                int so = rs.getInt(6);
-                int hbp = rs.getInt(7);
-                int fb = rs.getInt(8);
-                int sb = rs.getInt(9);
-                int tb = rs.getInt(10);
-                int hr = rs.getInt(11);
-                int totalBase = rs.getInt(13);
-                
-                // sets all the stats
-                ply.setAB(atBat);
-                ply.setRuns(runs);
-                ply.setHits(hits);
-                ply.setRbi(rbi);
-                ply.setBb(bb);
-                ply.setSo(so);
-                ply.setHp(hbp);
-                ply.setFB(fb);
-                ply.setSB(sb);
-                ply.setTB(tb);
-                ply.setHR(hr);
-                ply.setTotalBase(totalBase);    
-                
-                updatedBatterList.add(ply);
-            }
-            catch (SQLException e)
-            {        
-                System.out.println(e);
-            }
-        }
-        return updatedBatterList;
-    }
-    
-    public StringBuilder printStatsToFile(ArrayList<Batter> batterList, String teamID , String type) {
+    public StringBuilder printStatsToFile(ArrayList<Batter> batterList, String teamID , String type, String dateRange) {
         StringBuilder fileSB = new StringBuilder(2000);
         
         //Start with header for player stats build as string DC 4/30/2023
-        String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + StringUtil.padWithSpaces("\nPlayer",35) + "slg" + "ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR\n";
-        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 72) + "\n");
+        String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + " for dates " + dateRange + StringUtil.padWithSpaces("\nPlayer",35) + "  slg    " + "obp " + " ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR " + "TB" + "  avg\n";
+        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 90) + "\n");
         
         //now want to iterate over the away team DC 4/30/2023
         for(Batter player : batterList)
@@ -1000,9 +930,9 @@ public class BatterDB {
             fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
             // build stats string based on batter instance DC 4/30/2023
             String playerStats = 
-                      StringUtil.padWithSpacesReverse(""+player.getSLG(), 1) + "% "
-                    + StringUtil.padWithSpacesReverse(""+player.getOBP(), 1) + "% "
-                    + StringUtil.padWithSpacesReverse(""+player.getAB(), 1) + "  "
+                      StringUtil.padWithSpacesReverse(""+String.format("%.3f", player.getSLG()) + " ", 5) 
+                    + StringUtil.padWithSpacesReverse(""+String.format("%.3f", player.getOBP()) + "  "  , 8) 
+                    + StringUtil.padWithSpacesReverse(""+player.getAB(), 2) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getRuns(), 1) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getHits(), 1) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getRbi(), 2) + " "
@@ -1013,17 +943,18 @@ public class BatterDB {
                     + StringUtil.padWithSpacesReverse(""+player.getSB(), 2) + " "
                     + StringUtil.padWithSpacesReverse(""+player.getTB(), 2) + " "
                     + StringUtil.padWithSpacesReverse(""+player.getHR(), 2) + " "
-                    + StringUtil.padWithSpacesReverse(""+player.getTotalBase() , 2) + " \n";
+                    + StringUtil.padWithSpacesReverse(""+player.getTotalBase() , 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+String.format("%.3f", (double)player.getHits()/player.getAB()) + "  "  , 5) +  " \n";
             fileSB.append(playerStats);
         }
         //End away team
-        fileSB.append(StringUtil.repeatString("_", 72) + "\n");
+        fileSB.append(StringUtil.repeatString("_", 90) + "\n");
         
         //print string build object to console as test, in future we will just print this whole string to the file
         System.out.println(fileSB.toString());
         
         // create file name
-        String fileName = teamID.replace(" ", "_") + "_Aggregate_Stats_" + type + ".txt";
+        String fileName = teamID.replace(" ", "_") + "_Aggregate_Stats_" + type + "_" + dateRange + ".txt";
         
         //create file
         FileOutPut.writeFile(fileSB.toString(),fileName);
