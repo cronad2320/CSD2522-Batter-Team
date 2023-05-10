@@ -40,7 +40,7 @@ public class TeamLogGUI extends Application {
     private TextField awayScoreTextField = new TextField();
     
     private Label dateInstructionsLabel = new Label ("Enter the game's date by clicking the date from the calendar box:");
-    private Label buttonsInstructionsLabel = new Label ("Press submit to enter entered info, or press clear to clear all boxes:");
+    private Label buttonsInstructionsLabel = new Label ("Press the Create Game button to submit entered info, or press the Clear button to clear all boxes:");
     private Label gameDateLabel = new Label("Game Date");
     private DatePicker gameDateBox = new DatePicker();
     private Button createGameButton = new Button("Create Game");
