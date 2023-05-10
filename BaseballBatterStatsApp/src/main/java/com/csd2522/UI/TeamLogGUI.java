@@ -27,16 +27,20 @@ import java.util.ArrayList;
 public class TeamLogGUI extends Application {
     
     // Creating labels, combo boxes, text fields, date picker, and button
+    private Label teamInstructionsLabel = new Label("Choose the home team and away team from the two combo boxes:");
     private Label homeTeamLabel = new Label("Home Team");
     private ComboBox<String> homeComboBox = new ComboBox<>();
     private Label awayTeamLabel = new Label("Away Team");
     private ComboBox<String> awayComboBox = new ComboBox<>();
     
+    private Label scoreInstructionsLabel = new Label("Enter the score for both teams (enter integers that aren't the same):");
     private Label homeScoreLabel = new Label("Home Score");
     private TextField homeScoreTextField = new TextField();
     private Label awayScoreLabel = new Label("Away Score");
     private TextField awayScoreTextField = new TextField();
     
+    private Label dateInstructionsLabel = new Label ("Enter the game's date by clicking the date from the calendar box:");
+    private Label buttonsInstructionsLabel = new Label ("Press the Create Game button to submit entered info, or press the Clear button to clear all boxes:");
     private Label gameDateLabel = new Label("Game Date");
     private DatePicker gameDateBox = new DatePicker();
     private Button createGameButton = new Button("Create Game");
@@ -52,7 +56,7 @@ public class TeamLogGUI extends Application {
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.setHgap(10);
         grid.setVgap(10);
-        Scene scene = new Scene(grid, 625, 200);
+        Scene scene = new Scene(grid, 600, 275);
         
         // Sets the prompt text of the combo boxes
         homeComboBox.setPromptText("Select Home Team");
@@ -73,26 +77,50 @@ public class TeamLogGUI extends Application {
             awayComboBox.getItems().add(team);
         }
         
-        // Adds the team labels and team combo boxes to the first row
-        grid.add(homeTeamLabel, 0, 0);
-        grid.add(homeComboBox, 1, 0);
-        grid.add(awayTeamLabel, 2, 0);
-        grid.add(awayComboBox, 3, 0);
-       
-        // Adds the score labels and score text fields to the middle row
-        grid.add(homeScoreLabel, 0, 1);
-        grid.add(homeScoreTextField, 1, 1);
-        grid.add(awayScoreLabel, 2, 1);
-        grid.add(awayScoreTextField, 3, 1);
+        // Adds the combo box instructions
+        HBox comboInstructionsRow = new HBox(10);
+        comboInstructionsRow.getChildren().add(teamInstructionsLabel);
+        grid.add(comboInstructionsRow, 0, 0);
         
-        // Adds the game date label, game date date box, and create game button to the bottom row.
-        // Also creates an event listener for the create game button. Calls createGameButtonClicked() when clicked.
-        grid.add(gameDateLabel, 0, 2);
-        grid.add(gameDateBox, 1, 2);
+        // Adds the team labels and team combo boxes
+        HBox teamBoxesRow = new HBox(20);
+        teamBoxesRow.getChildren().add(homeTeamLabel);
+        teamBoxesRow.getChildren().add(homeComboBox);
+        teamBoxesRow.getChildren().add(awayTeamLabel);
+        teamBoxesRow.getChildren().add(awayComboBox);
+        grid.add(teamBoxesRow, 0, 1);
+        
+        // Adds the score instructions
+        HBox scoreInstructionsRow = new HBox();
+        scoreInstructionsRow.getChildren().add(scoreInstructionsLabel);
+        grid.add(scoreInstructionsRow, 0, 3);
+       
+        // Adds the score labels and score text fields
+        HBox scoreBoxesRow = new HBox(20);
+        scoreBoxesRow.getChildren().add(homeScoreLabel);
+        scoreBoxesRow.getChildren().add(homeScoreTextField);
+        scoreBoxesRow.getChildren().add(awayScoreLabel);
+        scoreBoxesRow.getChildren().add(awayScoreTextField);
+        grid.add(scoreBoxesRow, 0, 4);
+        
+        // Adds the instructions for the date box, submit button, and clear button
+        HBox dateInstructionsRow = new HBox();
+        dateInstructionsRow.getChildren().add(dateInstructionsLabel);
+        grid.add(dateInstructionsRow, 0, 6);
+        HBox buttonInstructionsRow = new HBox();
+        buttonInstructionsRow.getChildren().add(buttonsInstructionsLabel);
+        grid.add(buttonInstructionsRow, 0, 7);
+        
+        // Adds the game date label, game date date box, create game button, and clear button
+        // Also creates an event listener for the create game button and clear button.
+        HBox dateAndButtonsRow = new HBox(20);
+        dateAndButtonsRow.getChildren().add(gameDateLabel);
+        dateAndButtonsRow.getChildren().add(gameDateBox);
         createGameButton.setOnAction(event -> createGameButtonClicked());
-        grid.add(createGameButton, 2, 2);
+        dateAndButtonsRow.getChildren().add(createGameButton);
         clearButton.setOnAction(event -> clearButtonClicked());
-        grid.add(clearButton, 3, 2);
+        dateAndButtonsRow.getChildren().add(clearButton);
+        grid.add(dateAndButtonsRow, 0, 8);
         
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -126,7 +154,6 @@ public class TeamLogGUI extends Application {
                     int homeScore = Integer.parseInt(homeScoreTextField.getText());
 
                     // Get the date   
-                   
                     LocalDate date = gameDateBox.getValue();
                     String formattedDate = date.format(DateTimeFormatter.ISO_DATE);
 
