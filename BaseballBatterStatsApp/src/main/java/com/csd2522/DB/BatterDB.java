@@ -920,7 +920,7 @@ public class BatterDB {
         
         //Start with header for player stats build as string DC 4/30/2023
         String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + StringUtil.padWithSpaces("\nPlayer",35) + "slg   " + "obp " + " ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR " + "TB\n";
-        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 72) + "\n");
+        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 85) + "\n");
         
         //now want to iterate over the away team DC 4/30/2023
         for(Batter player : batterList)
@@ -930,7 +930,7 @@ public class BatterDB {
             fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
             // build stats string based on batter instance DC 4/30/2023
             String playerStats = 
-                      StringUtil.padWithSpacesReverse(""+player.getSLG(), 3) + "% "
+                      StringUtil.padWithSpacesReverse(""+player.getSLG(), 2) + "%"
                     + StringUtil.padWithSpacesReverse(""+player.getOBP(), 5) + "% "
                     + StringUtil.padWithSpacesReverse(""+player.getAB(), 2) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getRuns(), 1) + "  "
@@ -947,7 +947,7 @@ public class BatterDB {
             fileSB.append(playerStats);
         }
         //End away team
-        fileSB.append(StringUtil.repeatString("_", 72) + "\n");
+        fileSB.append(StringUtil.repeatString("_", 85) + "\n");
         
         //print string build object to console as test, in future we will just print this whole string to the file
         System.out.println(fileSB.toString());
