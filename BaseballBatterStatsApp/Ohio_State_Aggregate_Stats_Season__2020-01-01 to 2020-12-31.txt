@@ -1,5 +1,5 @@
 
-Aggregate Batting Stats for Ohio Statedate rage2020-01-01-2020-12-31
+Aggregate Batting Stats for Ohio State for dates 2020-01-01 to 2020-12-31
 Player                              slg    obp  ab  r  h rbi bb so hp 1B 2B 3B HR TB  avg
 __________________________________________________________________________________________
 Karaffa, Nate CF                   0.000 0.211  12  3  1   1  2  4  1  0  0  0  0  0 0.083 

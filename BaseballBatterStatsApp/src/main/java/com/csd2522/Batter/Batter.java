@@ -299,15 +299,15 @@ public class Batter {
     public double getSLG()
     {
        // sum up values for numberator
-       int sumBaseHits = this.getFB() + this.getSB() * 2 + this.getTB() * 3 + this.getHR()* 4;
+       double sumBaseHits = this.getFB() + this.getSB() * 2 + this.getTB() * 3 + this.getHR()* 4;
        // only calculate if values are greater than zero for both to avoid run time errors or incorrect negative numbers
        if(sumBaseHits > 0 && this.getAB() > 0)
        {
-           return (double) Math.round((sumBaseHits/this.getAB()) * 100)/100.0;
+           return (double) Math.round((sumBaseHits/this.getAB()) * 1000)/1000.0;
        }
        else
        {
-           return -1; // this number is not allowed so we will know something is wrong. 
+           return 0.000; // this number is not allowed so we will know something is wrong. 
        }
     }
     
@@ -318,16 +318,19 @@ public class Batter {
     public double getOBP()
     {
        // sum up values for numberator
-       int numerator = this.getHits() + this.getBb() + this.getHp();
-       int denominator = this.getAB() + this.getBb() + this.getHp() + this.getSo();
+       double numerator = this.getHits() + this.getBb() + this.getHp();
+       double denominator = this.getAB() + this.getBb() + this.getHp() + this.getSo();
        // only calculate if values are greater than zero for both to avoid run time errors or incorrect negative numbers
        if(numerator > 0 && denominator > 0)
        {
-           return (double) Math.round((numerator/denominator) * 100)/100.0;
+           System.out.println("numerator: " + numerator);
+           System.out.println("denominator: " + denominator);
+           System.out.println("OBP: " + numerator/denominator);
+           return (double) Math.round((numerator/denominator) * 1000)/1000.0;
        }
        else
        {
-           return -1; // this number is not allowed so we will know something is wrong. 
+           return (double) 0/1000; // this number is zero to let us know that it is zero 
        }
     }
     // calculate total bases then set total base with the value DC 5/4/2023

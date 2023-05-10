@@ -919,8 +919,8 @@ public class BatterDB {
         StringBuilder fileSB = new StringBuilder(2000);
         
         //Start with header for player stats build as string DC 4/30/2023
-        String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + StringUtil.padWithSpaces("\nPlayer",35) + "slg   " + "obp " + " ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR " + "TB\n";
-        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 85) + "\n");
+        String headerLineStats =  "\nAggregate Batting Stats for "+ teamID + " for dates " + dateRange + StringUtil.padWithSpaces("\nPlayer",35) + "  slg    " + "obp " + " ab " + " r " + " h " + "rbi " + "bb " + "so " + "hp " + "1B " + "2B " + "3B "+ "HR " + "TB" + "  avg\n";
+        fileSB.append(headerLineStats).append(StringUtil.repeatString("_", 90) + "\n");
         
         //now want to iterate over the away team DC 4/30/2023
         for(Batter player : batterList)
@@ -930,8 +930,8 @@ public class BatterDB {
             fileSB.append(StringUtil.padWithSpaces(playerHeadline, 35));
             // build stats string based on batter instance DC 4/30/2023
             String playerStats = 
-                      StringUtil.padWithSpacesReverse(""+player.getSLG(), 2) + "%"
-                    + StringUtil.padWithSpacesReverse(""+player.getOBP(), 5) + "% "
+                      StringUtil.padWithSpacesReverse(""+String.format("%.3f", player.getSLG()) + " ", 5) 
+                    + StringUtil.padWithSpacesReverse(""+String.format("%.3f", player.getOBP()) + "  "  , 8) 
                     + StringUtil.padWithSpacesReverse(""+player.getAB(), 2) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getRuns(), 1) + "  "
                     + StringUtil.padWithSpacesReverse(""+player.getHits(), 1) + "  "
@@ -943,11 +943,12 @@ public class BatterDB {
                     + StringUtil.padWithSpacesReverse(""+player.getSB(), 2) + " "
                     + StringUtil.padWithSpacesReverse(""+player.getTB(), 2) + " "
                     + StringUtil.padWithSpacesReverse(""+player.getHR(), 2) + " "
-                    + StringUtil.padWithSpacesReverse(""+player.getTotalBase() , 2) + " \n";
+                    + StringUtil.padWithSpacesReverse(""+player.getTotalBase() , 2) + " "
+                    + StringUtil.padWithSpacesReverse(""+String.format("%.3f", (double)player.getHits()/player.getAB()) + "  "  , 5) +  " \n";
             fileSB.append(playerStats);
         }
         //End away team
-        fileSB.append(StringUtil.repeatString("_", 85) + "\n");
+        fileSB.append(StringUtil.repeatString("_", 90) + "\n");
         
         //print string build object to console as test, in future we will just print this whole string to the file
         System.out.println(fileSB.toString());

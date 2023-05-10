@@ -138,7 +138,7 @@ public class AggregateStatGui extends Application{
                     
                     batterList = bdb.statsByGame(formattedStartDate, formattedEndDate, selectedIndex);
                     
-                    StringBuilder batterBuilder = bdb.printStatsToFile(batterList, selectedIndex, "Games", "_" + formattedStartDate + "-" + formattedEndDate);
+                    StringBuilder batterBuilder = bdb.printStatsToFile(batterList, selectedIndex, "Games_", formattedStartDate + " to " + formattedEndDate);
                     
                     new GameDisplayGUI().start(stage, batterBuilder);
                 }
@@ -186,7 +186,7 @@ public class AggregateStatGui extends Application{
                 
                 
                 
-                StringBuilder batterBuilder = bdb.printStatsToFile(batterList, teamIDSelectedValue, "Season", "_" + startDate + "-" + endDate);
+                StringBuilder batterBuilder = bdb.printStatsToFile(batterList, teamIDSelectedValue, "Season_", startDate + " to " + endDate);
                 
                 new GameDisplayGUI().start(stage, batterBuilder);
             }
